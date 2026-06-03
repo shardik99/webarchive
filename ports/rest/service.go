@@ -14,7 +14,7 @@ import (
 )
 
 type Pages interface {
-	ListAll(ctx context.Context, owner string) ([]*entity.Page, error)
+	ListAll(ctx context.Context, owner string, tags []string) ([]*entity.Page, error)
 	Save(ctx context.Context, site *entity.Page) error
 	Get(ctx context.Context, id uuid.UUID) (*entity.Page, error)
 	GetFile(ctx context.Context, pageID, fileID uuid.UUID) (*entity.File, error)
@@ -62,6 +62,11 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 		formats = []openapi.Format{"all"}
 	}
 
+	tags := req.Value.Tags
+	if len(tags) == 0 {
+		tags = params.Tags
+	}
+
 	switch {
 	case req.Value.URL != "":
 		url = req.Value.URL
@@ -84,7 +89,7 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 		}, nil
 	}
 
-	page := entity.NewPage(url, description, domainFormats...)
+	page := entity.NewPage(url, description, tags, domainFormats...)
 	page.Owner = OwnerFromContext(ctx)
 	page.Status = entity.StatusNew
 	page.Prepare(ctx, s.processor)
@@ -100,8 +105,8 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 	return &res, nil
 }
 
-func (s *Service) GetPages(ctx context.Context) (openapi.Pages, error) {
-	sites, err := s.pages.ListAll(ctx, OwnerFromContext(ctx))
+func (s *Service) GetPages(ctx context.Context, params openapi.GetPagesParams) (openapi.Pages, error) {
+	sites, err := s.pages.ListAll(ctx, OwnerFromContext(ctx), params.Tags)
 	if err != nil {
 		return nil, fmt.Errorf("list all: %w", err)
 	}

@@ -22,6 +22,7 @@ func PageToRestWithResults(page *entity.Page) openapi.PageWithResults {
 
 			return res
 		}(),
+		Tags:   page.Tags,
 		Status: StatusToRest(page.Status),
 		Meta: openapi.PageWithResultsMeta{
 			Title:       html.EscapeString(page.Meta.Title),
@@ -85,6 +86,7 @@ func BasePageToRest(page *entity.PageBase) openapi.Page {
 
 			return res
 		}(),
+		Tags:   page.Tags,
 		Status: StatusToRest(page.Status),
 	}
 }
@@ -108,6 +110,7 @@ func PageToRest(page *entity.Page) openapi.Page {
 
 			return res
 		}(),
+		Tags:   page.Tags,
 		Status: StatusToRest(page.Status),
 	}
 }
