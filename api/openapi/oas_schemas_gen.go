@@ -46,6 +46,7 @@ type AddPageReq struct {
 	URL         string    `json:"url"`
 	Description OptString `json:"description"`
 	Formats     []Format  `json:"formats"`
+	Tags        []string  `json:"tags"`
 }
 
 // GetURL returns the value of URL.
@@ -63,6 +64,11 @@ func (s *AddPageReq) GetFormats() []Format {
 	return s.Formats
 }
 
+// GetTags returns the value of Tags.
+func (s *AddPageReq) GetTags() []string {
+	return s.Tags
+}
+
 // SetURL sets the value of URL.
 func (s *AddPageReq) SetURL(val string) {
 	s.URL = val
@@ -76,6 +82,11 @@ func (s *AddPageReq) SetDescription(val OptString) {
 // SetFormats sets the value of Formats.
 func (s *AddPageReq) SetFormats(val []Format) {
 	s.Formats = val
+}
+
+// SetTags sets the value of Tags.
+func (s *AddPageReq) SetTags(val []string) {
+	s.Tags = val
 }
 
 // Ref: #/components/schemas/error
@@ -342,6 +353,7 @@ type Page struct {
 	URL     string    `json:"url"`
 	Created time.Time `json:"created"`
 	Formats []Format  `json:"formats"`
+	Tags    []string  `json:"tags"`
 	Status  Status    `json:"status"`
 	Meta    PageMeta  `json:"meta"`
 }
@@ -364,6 +376,11 @@ func (s *Page) GetCreated() time.Time {
 // GetFormats returns the value of Formats.
 func (s *Page) GetFormats() []Format {
 	return s.Formats
+}
+
+// GetTags returns the value of Tags.
+func (s *Page) GetTags() []string {
+	return s.Tags
 }
 
 // GetStatus returns the value of Status.
@@ -394,6 +411,11 @@ func (s *Page) SetCreated(val time.Time) {
 // SetFormats sets the value of Formats.
 func (s *Page) SetFormats(val []Format) {
 	s.Formats = val
+}
+
+// SetTags sets the value of Tags.
+func (s *Page) SetTags(val []string) {
+	s.Tags = val
 }
 
 // SetStatus sets the value of Status.
@@ -451,6 +473,7 @@ type PageWithResults struct {
 	URL     string              `json:"url"`
 	Created time.Time           `json:"created"`
 	Formats []Format            `json:"formats"`
+	Tags    []string            `json:"tags"`
 	Status  Status              `json:"status"`
 	Meta    PageWithResultsMeta `json:"meta"`
 	Results []Result            `json:"results"`
@@ -474,6 +497,11 @@ func (s *PageWithResults) GetCreated() time.Time {
 // GetFormats returns the value of Formats.
 func (s *PageWithResults) GetFormats() []Format {
 	return s.Formats
+}
+
+// GetTags returns the value of Tags.
+func (s *PageWithResults) GetTags() []string {
+	return s.Tags
 }
 
 // GetStatus returns the value of Status.
@@ -509,6 +537,11 @@ func (s *PageWithResults) SetCreated(val time.Time) {
 // SetFormats sets the value of Formats.
 func (s *PageWithResults) SetFormats(val []Format) {
 	s.Formats = val
+}
+
+// SetTags sets the value of Tags.
+func (s *PageWithResults) SetTags(val []string) {
+	s.Tags = val
 }
 
 // SetStatus sets the value of Status.

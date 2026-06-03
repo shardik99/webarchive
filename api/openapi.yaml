@@ -11,6 +11,15 @@ paths:
     get:
       operationId: getPages
       summary: Get all pages
+      parameters:
+        - in: query
+          name: tags
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
       responses:
         200:
           description: All pages data
@@ -40,6 +49,14 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/format'
+        - in: query
+          name: tags
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: string
       requestBody:
         content:
           application/json:
@@ -54,6 +71,10 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/format'
+                tags:
+                  type: array
+                  items:
+                    type: string
               required:
                 - url
       responses:
@@ -182,6 +203,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/format'
+        tags:
+          type: array
+          items:
+            type: string
         status:
           $ref: '#/components/schemas/status'
         meta:

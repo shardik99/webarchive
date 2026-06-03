@@ -31,7 +31,7 @@ type Handler interface {
 	// Get all pages.
 	//
 	// GET /pages
-	GetPages(ctx context.Context) (Pages, error)
+	GetPages(ctx context.Context, params GetPagesParams) (Pages, error)
 	// NewError creates *ErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.

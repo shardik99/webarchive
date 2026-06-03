@@ -45,7 +45,7 @@ func (UnimplementedHandler) GetPage(ctx context.Context, params GetPageParams) (
 // Get all pages.
 //
 // GET /pages
-func (UnimplementedHandler) GetPages(ctx context.Context) (r Pages, _ error) {
+func (UnimplementedHandler) GetPages(ctx context.Context, params GetPagesParams) (r Pages, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

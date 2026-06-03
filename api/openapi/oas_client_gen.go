@@ -46,7 +46,7 @@ type Invoker interface {
 	// Get all pages.
 	//
 	// GET /pages
-	GetPages(ctx context.Context) (Pages, error)
+	GetPages(ctx context.Context, params GetPagesParams) (Pages, error)
 }
 
 // Client implements OAS client.
@@ -216,6 +216,29 @@ func (c *Client) sendAddPage(ctx context.Context, request OptAddPageReq, params 
 				for i, item := range params.Formats {
 					if err := func() error {
 						return e.EncodeValue(conv.StringToString(string(item)))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.Tags {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
 					}(); err != nil {
 						return errors.Wrapf(err, "[%d]", i)
 					}
@@ -457,12 +480,12 @@ func (c *Client) sendGetPage(ctx context.Context, params GetPageParams) (res Get
 // Get all pages.
 //
 // GET /pages
-func (c *Client) GetPages(ctx context.Context) (Pages, error) {
-	res, err := c.sendGetPages(ctx)
+func (c *Client) GetPages(ctx context.Context, params GetPagesParams) (Pages, error) {
+	res, err := c.sendGetPages(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetPages(ctx context.Context) (res Pages, err error) {
+func (c *Client) sendGetPages(ctx context.Context, params GetPagesParams) (res Pages, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getPages"),
 		semconv.HTTPMethodKey.String("GET"),
@@ -501,6 +524,33 @@ func (c *Client) sendGetPages(ctx context.Context) (res Pages, err error) {
 	var pathParts [1]string
 	pathParts[0] = "/pages"
 	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "tags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "tags",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.Tags {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
