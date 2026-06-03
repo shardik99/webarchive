@@ -43,7 +43,7 @@ func TestSite(t *testing.T) {
 	t.Run("base path", func(t *testing.T) {
 		t.Parallel()
 
-		site := entity.NewPage("https://google.com", "Save all google", entity.FormatPDF, entity.FormatSingleFile)
+		site := entity.NewPage("https://google.com", "Save all google", nil, entity.FormatPDF, entity.FormatSingleFile)
 		site.Created = site.Created.Truncate(time.Microsecond)
 
 		err := siteRepo.Save(ctx, site)
@@ -56,7 +56,7 @@ func TestSite(t *testing.T) {
 		assert.Equal(t, site.URL, storedSite.URL)
 		assert.Equal(t, site.Status, storedSite.Status)
 
-		all, err := siteRepo.ListAll(ctx, "")
+		all, err := siteRepo.ListAll(ctx, "", nil)
 		require.NoError(t, err)
 		require.Len(t, all, 1)
 

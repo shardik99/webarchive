@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/debug"
+	"strings"
 	"sync"
 	"time"
 
@@ -56,9 +57,18 @@ type PageBase struct {
 	Status      Status
 	Meta        Meta
 	Owner       string
+	Tags        []string
 }
 
-func NewPage(url string, description string, formats ...Format) *Page {
+func NewPage(url string, description string, tags []string, formats ...Format) *Page {
+	normalizedTags := make([]string, 0, len(tags))
+	for _, t := range tags {
+		trimmed := strings.TrimSpace(t)
+		if trimmed != "" {
+			normalizedTags = append(normalizedTags, strings.ToLower(trimmed))
+		}
+	}
+
 	return &Page{
 		PageBase: PageBase{
 			ID:          uuid.New(),
@@ -67,6 +77,7 @@ func NewPage(url string, description string, formats ...Format) *Page {
 			Formats:     formats,
 			Created:     time.Now(),
 			Version:     1,
+			Tags:        normalizedTags,
 		},
 		cache: NewCache(),
 	}
