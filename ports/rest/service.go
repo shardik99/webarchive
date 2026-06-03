@@ -89,7 +89,15 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 		}, nil
 	}
 
-	page := entity.NewPage(url, description, tags, domainFormats...)
+	var headers, cookies map[string]string
+	if req.Value.Headers.IsSet() {
+		headers = req.Value.Headers.Value
+	}
+	if req.Value.Cookies.IsSet() {
+		cookies = req.Value.Cookies.Value
+	}
+
+	page := entity.NewPage(url, description, tags, headers, cookies, domainFormats...)
 	page.Owner = OwnerFromContext(ctx)
 	page.Status = entity.StatusNew
 	page.Prepare(ctx, s.processor)
