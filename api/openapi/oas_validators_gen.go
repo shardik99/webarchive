@@ -55,6 +55,8 @@ func (s Format) Validate() error {
 		return nil
 	case "headers":
 		return nil
+	case "markdown":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}

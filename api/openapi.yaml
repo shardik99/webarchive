@@ -184,6 +184,7 @@ components:
         - html
         - single_file
         - headers
+        - markdown
     error:
       type: object
       properties:

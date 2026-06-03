@@ -582,6 +582,8 @@ func (s *Format) Decode(d *jx.Decoder) error {
 		*s = FormatSingleFile
 	case FormatHeaders:
 		*s = FormatHeaders
+	case FormatMarkdown:
+		*s = FormatMarkdown
 	default:
 		*s = Format(v)
 	}

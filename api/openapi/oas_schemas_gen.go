@@ -194,6 +194,7 @@ const (
 	FormatHTML       Format = "html"
 	FormatSingleFile Format = "single_file"
 	FormatHeaders    Format = "headers"
+	FormatMarkdown   Format = "markdown"
 )
 
 // AllValues returns all Format values.
@@ -204,6 +205,7 @@ func (Format) AllValues() []Format {
 		FormatHTML,
 		FormatSingleFile,
 		FormatHeaders,
+		FormatMarkdown,
 	}
 }
 
@@ -219,6 +221,8 @@ func (s Format) MarshalText() ([]byte, error) {
 	case FormatSingleFile:
 		return []byte(s), nil
 	case FormatHeaders:
+		return []byte(s), nil
+	case FormatMarkdown:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -242,6 +246,9 @@ func (s *Format) UnmarshalText(data []byte) error {
 		return nil
 	case FormatHeaders:
 		*s = FormatHeaders
+		return nil
+	case FormatMarkdown:
+		*s = FormatMarkdown
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

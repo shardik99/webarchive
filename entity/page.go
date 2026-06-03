@@ -23,6 +23,7 @@ const (
 	FormatSingleFile
 	FormatPDF
 	FormatHTML
+	FormatMarkdown
 )
 
 var AllFormats = []Format{
@@ -30,6 +31,7 @@ var AllFormats = []Format{
 	FormatPDF,
 	FormatSingleFile,
 	FormatHTML,
+	FormatMarkdown,
 }
 
 type Status uint8

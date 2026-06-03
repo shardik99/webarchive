@@ -65,6 +65,7 @@ func NewProcessors(cfg config.Config, log *zap.Logger) (*Processors, error) {
 			entity.FormatPDF:        NewPDF(cfg.PDF),
 			entity.FormatSingleFile: NewSingleFile(httpClient, log),
 			entity.FormatHTML:       NewHTML(httpClient, log),
+			entity.FormatMarkdown:   NewMarkdown(httpClient, log),
 		},
 	}
 
