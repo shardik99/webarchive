@@ -7,11 +7,11 @@ This document outlines planned features, missing functionality, and potential ar
 According to the initial project roadmap, several features are slated for future development:
 
 1.  **Database Flexibility**: The system currently hardcodes BadgerDB. The architecture is flexible enough (via the `ports` and `adapters` interfaces) to support external SQL databases (like PostgreSQL or SQLite) with or without separate blob storage (like S3 or Minio).
-2.  **Markdown Support**: Implementing a format processor that converts web articles into clean Markdown format.
-3.  **Companion Chrome Extension**: Developing a browser extension that allows users to easily send their currently viewed page to the archive. This extension should leverage the browser's active session to extract and forward the authenticated headers and cookies directly to the webarchive API.
+2.  **Companion Chrome Extension**: Developing a browser extension that allows users to easily send their currently viewed page to the archive. This extension should leverage the browser's active session to extract and forward the authenticated headers and cookies directly to the webarchive API.
 
 ## Recently Completed Features
 
+*   **Markdown Support**: Implemented a format processor that parses the web article's main content cleanly and converts it into standard Markdown.
 *   **HTML with Separate Resources**: A new `html` format has been implemented that saves the raw HTML while traversing, downloading, and relinking all external resources into separate files within the archive.
 *   **Tags and Categories**: Added full support for tagging and categorizing archives in the backend API, BadgerDB, and UI.
 *   **Authentication & Multi-User Support**: Added middleware authentication and `Owner` scoped filtering to ensure archives belong to specific users.
