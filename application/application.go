@@ -91,6 +91,8 @@ func NewApplication(cfg config.Config) (Application, error) {
 		})
 	}
 
+	httpHandler = rest.AuthMiddleware(cfg.Auth, httpHandler)
+
 	httpServer := http.Server{
 		Addr:              cfg.API.Address,
 		Handler:           httpHandler,

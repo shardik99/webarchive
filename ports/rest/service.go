@@ -14,7 +14,7 @@ import (
 )
 
 type Pages interface {
-	ListAll(ctx context.Context) ([]*entity.Page, error)
+	ListAll(ctx context.Context, owner string) ([]*entity.Page, error)
 	Save(ctx context.Context, site *entity.Page) error
 	Get(ctx context.Context, id uuid.UUID) (*entity.Page, error)
 	GetFile(ctx context.Context, pageID, fileID uuid.UUID) (*entity.File, error)
@@ -38,6 +38,10 @@ type Service struct {
 func (s *Service) GetPage(ctx context.Context, params openapi.GetPageParams) (openapi.GetPageRes, error) {
 	page, err := s.pages.Get(ctx, params.ID)
 	if err != nil {
+		return &openapi.GetPageNotFound{}, nil
+	}
+
+	if page.Owner != OwnerFromContext(ctx) {
 		return &openapi.GetPageNotFound{}, nil
 	}
 
@@ -81,6 +85,7 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 	}
 
 	page := entity.NewPage(url, description, domainFormats...)
+	page.Owner = OwnerFromContext(ctx)
 	page.Status = entity.StatusNew
 	page.Prepare(ctx, s.processor)
 
@@ -96,7 +101,7 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 }
 
 func (s *Service) GetPages(ctx context.Context) (openapi.Pages, error) {
-	sites, err := s.pages.ListAll(ctx)
+	sites, err := s.pages.ListAll(ctx, OwnerFromContext(ctx))
 	if err != nil {
 		return nil, fmt.Errorf("list all: %w", err)
 	}
@@ -110,6 +115,11 @@ func (s *Service) GetPages(ctx context.Context) (openapi.Pages, error) {
 }
 
 func (s *Service) GetFile(ctx context.Context, params openapi.GetFileParams) (openapi.GetFileRes, error) {
+	page, err := s.pages.Get(ctx, params.ID)
+	if err != nil || page.Owner != OwnerFromContext(ctx) {
+		return &openapi.GetFileNotFound{}, nil
+	}
+
 	file, err := s.pages.GetFile(ctx, params.ID, params.FileID)
 	if err != nil {
 		return &openapi.GetFileNotFound{}, nil
