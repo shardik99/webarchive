@@ -20,7 +20,7 @@ import (
 const defaultEncoding = "utf-8"
 
 type processor interface {
-	Process(ctx context.Context, url string, cache *entity.Cache) ([]entity.File, error)
+	Process(ctx context.Context, page *entity.Page) ([]entity.File, error)
 }
 
 func NewProcessors(cfg config.Config, log *zap.Logger) (*Processors, error) {
@@ -64,6 +64,7 @@ func NewProcessors(cfg config.Config, log *zap.Logger) (*Processors, error) {
 			entity.FormatHeaders:    NewHeaders(httpClient),
 			entity.FormatPDF:        NewPDF(cfg.PDF),
 			entity.FormatSingleFile: NewSingleFile(httpClient, log),
+			entity.FormatHTML:       NewHTML(httpClient, log),
 		},
 	}
 
@@ -75,7 +76,7 @@ type Processors struct {
 	client     *http.Client
 }
 
-func (p *Processors) Process(ctx context.Context, format entity.Format, url string, cache *entity.Cache) entity.Result {
+func (p *Processors) Process(ctx context.Context, format entity.Format, page *entity.Page) entity.Result {
 	result := entity.Result{Format: format}
 
 	proc, ok := p.processors[format]
@@ -85,7 +86,7 @@ func (p *Processors) Process(ctx context.Context, format entity.Format, url stri
 		return result
 	}
 
-	files, err := proc.Process(ctx, url, cache)
+	files, err := proc.Process(ctx, page)
 	if err != nil {
 		result.Err = fmt.Errorf("process: %w", err)
 
@@ -103,10 +104,17 @@ func (p *Processors) OverrideProcessor(format entity.Format, proc processor) err
 	return nil
 }
 
-func (p *Processors) GetMeta(ctx context.Context, url string, cache *entity.Cache) (entity.Meta, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+func (p *Processors) GetMeta(ctx context.Context, page *entity.Page) (entity.Meta, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, page.URL, nil)
 	if err != nil {
 		return entity.Meta{}, fmt.Errorf("new request: %w", err)
+	}
+
+	for k, v := range page.Headers {
+		req.Header.Add(k, v)
+	}
+	for k, v := range page.Cookies {
+		req.AddCookie(&http.Cookie{Name: k, Value: v})
 	}
 
 	response, err := p.client.Do(req)
@@ -126,7 +134,7 @@ func (p *Processors) GetMeta(ctx context.Context, url string, cache *entity.Cach
 		_ = response.Body.Close()
 	}()
 
-	tee := io.TeeReader(response.Body, cache)
+	tee := io.TeeReader(response.Body, page.Cache())
 
 	htmlNode, err := html.Parse(tee)
 	if err != nil {

@@ -22,9 +22,8 @@ func TestProcessors_GetMeta(t *testing.T) {
 	procs, err := NewProcessors(cfg, zaptest.NewLogger(t))
 	require.NoError(t, err)
 
-	cache := entity.NewCache()
-
-	meta, err := procs.GetMeta(ctx, "https://habr.com/ru/companies/wirenboard/articles/722718/", cache)
+	page := entity.NewPage("https://habr.com/ru/companies/wirenboard/articles/722718/", "", nil, nil, nil)
+	meta, err := procs.GetMeta(ctx, page)
 	require.NoError(t, err)
 	assert.Equal(t, "Сколько стоит умный дом? Рассказываю, как строил свой и что получилось за 1000 руб./м² / Хабр", meta.Title)
 }

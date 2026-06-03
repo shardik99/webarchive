@@ -17,15 +17,22 @@ type Headers struct {
 	client *http.Client
 }
 
-func (h *Headers) Process(ctx context.Context, url string, _ *entity.Cache) ([]entity.File, error) {
+func (h *Headers) Process(ctx context.Context, page *entity.Page) ([]entity.File, error) {
 	var (
 		headersFile entity.File
 		err         error
 	)
 
-	req, reqErr := http.NewRequestWithContext(ctx, http.MethodHead, url, nil)
+	req, reqErr := http.NewRequestWithContext(ctx, http.MethodHead, page.URL, nil)
 	if reqErr != nil {
 		return nil, fmt.Errorf("create request: %w", reqErr)
+	}
+
+	for k, v := range page.Headers {
+		req.Header.Add(k, v)
+	}
+	for k, v := range page.Cookies {
+		req.AddCookie(&http.Cookie{Name: k, Value: v})
 	}
 
 	resp, doErr := h.client.Do(req)

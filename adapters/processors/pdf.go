@@ -19,7 +19,7 @@ type PDF struct {
 	cfg config.PDF
 }
 
-func (p *PDF) Process(_ context.Context, url string, cache *entity.Cache) ([]entity.File, error) {
+func (p *PDF) Process(_ context.Context, page *entity.Page) ([]entity.File, error) {
 	gen, err := wkhtmltopdf.NewPDFGenerator()
 	if err != nil {
 		return nil, fmt.Errorf("new pdf generator: %w", err)
@@ -35,7 +35,7 @@ func (p *PDF) Process(_ context.Context, url string, cache *entity.Cache) ([]ent
 	}
 
 	gen.Grayscale.Set(p.cfg.Grayscale)
-	gen.Title.Set(url)
+	gen.Title.Set(page.URL)
 
 	opts := wkhtmltopdf.NewPageOptions()
 	opts.PrintMediaType.Set(p.cfg.MediaPrint)
@@ -44,7 +44,7 @@ func (p *PDF) Process(_ context.Context, url string, cache *entity.Cache) ([]ent
 	opts.LoadErrorHandling.Set("ignore")
 	opts.LoadMediaErrorHandling.Set("skip")
 	opts.FooterRight.Set("[opts]")
-	opts.HeaderLeft.Set(url)
+	opts.HeaderLeft.Set(page.URL)
 	opts.HeaderRight.Set(time.Now().Format(time.DateOnly))
 	opts.FooterFontSize.Set(10)
 	opts.Zoom.Set(p.cfg.Zoom)
@@ -54,14 +54,22 @@ func (p *PDF) Process(_ context.Context, url string, cache *entity.Cache) ([]ent
 	opts.DisableExternalLinks.Set(false)
 	opts.DisableInternalLinks.Set(false)
 
-	var page wkhtmltopdf.PageProvider
-	if len(cache.Get()) > 0 {
-		page = &wkhtmltopdf.PageReader{Input: cache.Reader(), PageOptions: opts}
-	} else {
-		page = &wkhtmltopdf.Page{Input: url, PageOptions: opts}
+	for k, v := range page.Headers {
+		opts.CustomHeader.Set(k, v)
 	}
 
-	gen.AddPage(page)
+	for k, v := range page.Cookies {
+		opts.Cookie.Set(k, v)
+	}
+
+	var provider wkhtmltopdf.PageProvider
+	if len(page.Cache().Get()) > 0 {
+		provider = &wkhtmltopdf.PageReader{Input: page.Cache().Reader(), PageOptions: opts}
+	} else {
+		provider = &wkhtmltopdf.Page{Input: page.URL, PageOptions: opts}
+	}
+
+	gen.AddPage(provider)
 
 	err = gen.Create()
 	if err != nil {

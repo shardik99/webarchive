@@ -22,11 +22,11 @@ type SingleFile struct {
 	log    *zap.Logger
 }
 
-func (s *SingleFile) Process(ctx context.Context, pageURL string, cache *entity.Cache) ([]entity.File, error) {
-	reader := cache.Reader()
+func (s *SingleFile) Process(ctx context.Context, page *entity.Page) ([]entity.File, error) {
+	reader := page.Cache().Reader()
 
 	if reader == nil {
-		response, err := s.get(ctx, pageURL)
+		response, err := s.get(ctx, page, page.URL)
 		if err != nil {
 			return nil, err
 		}
@@ -38,7 +38,11 @@ func (s *SingleFile) Process(ctx context.Context, pageURL string, cache *entity.
 		reader = response.Body
 	}
 
-	inlinedHTML, err := internal.NewMediaInline(s.log, s.get).Inline(ctx, reader, pageURL)
+	getter := func(ctx context.Context, url string) (*http.Response, error) {
+		return s.get(ctx, page, url)
+	}
+
+	inlinedHTML, err := internal.NewMediaInline(s.log, getter).Inline(ctx, reader, page.URL)
 	if err != nil {
 		return nil, fmt.Errorf("inline media: %w", err)
 	}
@@ -53,10 +57,18 @@ func (s *SingleFile) Process(ctx context.Context, pageURL string, cache *entity.
 	return []entity.File{htmlFile}, nil
 }
 
-func (s *SingleFile) get(ctx context.Context, url string) (*http.Response, error) {
+func (s *SingleFile) get(ctx context.Context, page *entity.Page, url string) (*http.Response, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("new request: %w", err)
+	}
+
+	for k, v := range page.Headers {
+		req.Header.Add(k, v)
+	}
+
+	for k, v := range page.Cookies {
+		req.AddCookie(&http.Cookie{Name: k, Value: v})
 	}
 
 	response, err := s.client.Do(req)
