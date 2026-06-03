@@ -33,6 +33,7 @@ type Config struct {
 	API     API     `env:",prefix=API_"`
 	UI      UI      `env:",prefix=UI_"`
 	PDF     PDF     `env:",prefix=PDF_"`
+	Auth    Auth    `env:",prefix=AUTH_"`
 }
 
 type PDF struct {
@@ -61,4 +62,11 @@ type DB struct {
 
 type Logging struct {
 	Debug bool `env:"DEBUG"`
+}
+
+type Auth struct {
+	Enabled       bool   `env:"ENABLED,default=false"`
+	BasicUsername string `env:"BASIC_USERNAME"`
+	BasicPassword string `env:"BASIC_PASSWORD"`
+	ProxyHeader   string `env:"PROXY_HEADER,default=Remote-User"`
 }

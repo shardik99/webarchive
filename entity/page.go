@@ -55,6 +55,7 @@ type PageBase struct {
 	Version     uint16
 	Status      Status
 	Meta        Meta
+	Owner       string
 }
 
 func NewPage(url string, description string, formats ...Format) *Page {
