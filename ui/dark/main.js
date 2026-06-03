@@ -1,6 +1,7 @@
 let globalData = [];
 let viewMode = localStorage.getItem('viewMode') || 'grid';
 let currentSearch = '';
+let currentTag = '';
 
 function initApp() {
     $("#site_title_sidebar").html("WebArchive " + window.location.hostname);
@@ -36,10 +37,17 @@ function setViewMode(mode) {
     }
 }
 
+function filterByTag(tag) {
+    currentTag = tag;
+    history.pushState(null, null, "/");
+    renderArchives();
+}
+
 function goHome() {
     history.pushState(null, null, "/");
     $('#search_input').val('');
     currentSearch = '';
+    currentTag = '';
     loadIndex();
 }
 
@@ -56,6 +64,21 @@ function loadIndex() {
                 return;
             }
             globalData = data;
+            
+            // Extract unique tags and render sidebar
+            let allTags = new Set();
+            if (globalData) {
+                globalData.forEach(v => {
+                    if (v.tags) v.tags.forEach(t => allTags.add(t));
+                });
+            }
+            let tagsHtml = '';
+            Array.from(allTags).sort().forEach(tag => {
+                let activeClass = (tag === currentTag) ? 'active' : '';
+                tagsHtml += `<li class="nav-item ${activeClass}" onclick="filterByTag('${tag}')"># ${tag}</li>`;
+            });
+            $('#tags_container').html(tagsHtml);
+
             // Ensure toggle buttons reflect current state
             $('.toggle-btn').removeClass('active');
             $(`#btn_${viewMode}_view`).addClass('active');
@@ -75,7 +98,18 @@ function renderArchives() {
     const tmplId = viewMode === 'grid' ? 'card_tmpl' : 'list_row_tmpl';
     const tmpl = document.getElementById(tmplId);
 
+    // Update active state in sidebar tags
+    $('#tags_container .nav-item').removeClass('active');
+    if (currentTag) {
+        $(`#tags_container .nav-item:contains('# ${currentTag}')`).addClass('active');
+    }
+
     globalData.forEach(function (v) {
+        // Tag filtering
+        if (currentTag && (!v.tags || !v.tags.includes(currentTag))) {
+            return;
+        }
+
         // Client-side search filtering
         if (currentSearch) {
             const titleMatch = v.meta.title && v.meta.title.toLowerCase().includes(currentSearch);
@@ -99,9 +133,19 @@ function renderArchives() {
         $(item_elem).find(".title-text").html(v.meta.title || 'Untitled');
         $(item_elem).find(".url-text").html(v.url);
         
-        // Description (only in card view usually)
+        // Description and Tags (only in card view usually)
         if (viewMode === 'grid') {
             $(item_elem).find(".desc-text").html(v.meta.description || '');
+            
+            // Render Tags
+            let tagsContainer = $(item_elem).find(".tags-container");
+            if (v.tags && v.tags.length > 0) {
+                let tHtml = '';
+                v.tags.forEach(t => {
+                    tHtml += `<span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 11px;">${t}</span>`;
+                });
+                tagsContainer.html(tHtml);
+            }
         }
 
         elem.append(item_elem);

@@ -25,10 +25,9 @@
             <li class="nav-item active" onclick="goHome()">All Archives</li>
             
             <li class="nav-item" style="margin-top: 32px; font-size: 12px; font-weight: 700; opacity: 0.5; cursor: default;">TAGS</li>
-            <!-- Static Mocks for tags -->
-            <li class="nav-item"># Development</li>
-            <li class="nav-item"># Design</li>
-            <li class="nav-item"># Reading List</li>
+            <div id="tags_container">
+                <!-- Tags populated dynamically via JS -->
+            </div>
         </ul>
     </aside>
 
@@ -68,6 +67,7 @@
         <h3 class="card-title title-text"></h3>
         <p class="card-url url-text"></p>
         <p class="card-desc desc-text"></p>
+        <div class="card-tags tags-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;"></div>
         <div class="card-footer">
             <span class="created-text"></span>
         </div>
