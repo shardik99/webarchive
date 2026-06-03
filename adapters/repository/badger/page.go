@@ -121,7 +121,7 @@ func (p *Page) Get(_ context.Context, id uuid.UUID) (*entity.Page, error) {
 	return &page, nil
 }
 
-func (p *Page) ListAll(ctx context.Context) ([]*entity.Page, error) {
+func (p *Page) ListAll(ctx context.Context, owner string) ([]*entity.Page, error) {
 	pages := make([]*entity.Page, 0, 100)
 
 	err := p.db.View(func(txn *badger.Txn) error {
@@ -148,7 +148,9 @@ func (p *Page) ListAll(ctx context.Context) ([]*entity.Page, error) {
 				return fmt.Errorf("get item: %w", err)
 			}
 
-			pages = append(pages, &page)
+			if page.Owner == owner {
+				pages = append(pages, &page)
+			}
 		}
 
 		return nil

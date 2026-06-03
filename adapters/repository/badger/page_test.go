@@ -27,14 +27,15 @@ func TestSite(t *testing.T) {
 	tempDir, err := os.MkdirTemp(os.TempDir(), "badger_test")
 	require.NoError(t, err)
 
-	t.Cleanup(func() {
-		assert.NoError(t, os.RemoveAll(tempDir))
-	})
-
 	log := zaptest.NewLogger(t)
 
 	db, err := repository.NewBadger(tempDir, log.Named("db"))
 	require.NoError(t, err)
+
+	t.Cleanup(func() {
+		db.Close()
+		assert.NoError(t, os.RemoveAll(tempDir))
+	})
 
 	siteRepo, err := NewPage(db)
 	require.NoError(t, err)
@@ -55,7 +56,7 @@ func TestSite(t *testing.T) {
 		assert.Equal(t, site.URL, storedSite.URL)
 		assert.Equal(t, site.Status, storedSite.Status)
 
-		all, err := siteRepo.ListAll(ctx)
+		all, err := siteRepo.ListAll(ctx, "")
 		require.NoError(t, err)
 		require.Len(t, all, 1)
 
