@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>WebArchive</title>
+    <!-- Use Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/lib.js"></script>
+    <script src="/static/main.js"></script>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Sidebar -->
+    <aside class="sidebar glass">
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span id="site_title_sidebar">WebArchive</span>
+        </div>
+        
+        <ul class="nav-menu">
+            <li class="nav-item active" onclick="goHome()">All Archives</li>
+            
+            <li class="nav-item" style="margin-top: 32px; font-size: 12px; font-weight: 700; opacity: 0.5; cursor: default;">TAGS</li>
+            <!-- Static Mocks for tags -->
+            <li class="nav-item"># Development</li>
+            <li class="nav-item"># Design</li>
+            <li class="nav-item"># Reading List</li>
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Topbar -->
+        <header class="topbar glass">
+            <div class="search-container">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="search_input" class="search-input" placeholder="Search archives by title or URL...">
+            </div>
+            
+            <!-- View Toggles -->
+            <div class="view-toggles" id="view_toggles_container">
+                <button id="btn_grid_view" class="toggle-btn active" title="Grid View">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                </button>
+                <button id="btn_list_view" class="toggle-btn" title="List View">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Data Container -->
+        <div id="data" class="data-container">
+            Loading...
+        </div>
+    </main>
+</div>
+
+<!-- Templates -->
+<template id="card_tmpl">
+    <div class="archive-card glass item-container">
+        <div class="card-header">
+            <span class="status-badge"></span>
+        </div>
+        <h3 class="card-title title-text"></h3>
+        <p class="card-url url-text"></p>
+        <p class="card-desc desc-text"></p>
+        <div class="card-footer">
+            <span class="created-text"></span>
+        </div>
+    </div>
+</template>
+
+<template id="list_row_tmpl">
+    <div class="list-row glass item-container">
+        <div class="list-col-main">
+            <h3 class="title-text"></h3>
+            <p class="url-text"></p>
+        </div>
+        <div class="list-col-status">
+            <span class="status-badge"></span>
+        </div>
+        <div class="list-col-date">
+            <span class="created-text"></span>
+        </div>
+    </div>
+</template>
+
+<template id="page_tmpl">
+    <div class="page-view glass">
+        <a onclick="history.back()" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Back to Archives
+        </a>
+        <div class="page-header">
+            <h2 id="page_title"></h2>
+            <h5 id="page_url" class="link-external" onclick="window.open(this.innerText, '_blank')"></h5>
+        </div>
+        
+        <div class="page-body">
+            <p id="page_description"></p>
+            <h4 class="section-title">Archived Files</h4>
+            <div id="results" class="results-grid"></div>
+        </div>
+    </div>
+</template>
+
+<template id="result_tmpl">
+    <div class="result-card">
+        <span class="format-badge"></span>
+        <a class="result-link"></a>
+    </div>
+</template>
+
+</body>
+</html>
