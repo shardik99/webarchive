@@ -49,6 +49,8 @@ func (s Format) Validate() error {
 		return nil
 	case "pdf":
 		return nil
+	case "html":
+		return nil
 	case "single_file":
 		return nil
 	case "headers":

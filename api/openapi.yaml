@@ -75,6 +75,14 @@ paths:
                   type: array
                   items:
                     type: string
+                headers:
+                  type: object
+                  additionalProperties:
+                    type: string
+                cookies:
+                  type: object
+                  additionalProperties:
+                    type: string
               required:
                 - url
       responses:
@@ -173,6 +181,7 @@ components:
       enum:
         - all
         - pdf
+        - html
         - single_file
         - headers
     error:

@@ -43,10 +43,12 @@ func (s *AddPageBadRequest) SetError(val string) {
 func (*AddPageBadRequest) addPageRes() {}
 
 type AddPageReq struct {
-	URL         string    `json:"url"`
-	Description OptString `json:"description"`
-	Formats     []Format  `json:"formats"`
-	Tags        []string  `json:"tags"`
+	URL         string               `json:"url"`
+	Description OptString            `json:"description"`
+	Formats     []Format             `json:"formats"`
+	Tags        []string             `json:"tags"`
+	Headers     OptAddPageReqHeaders `json:"headers"`
+	Cookies     OptAddPageReqCookies `json:"cookies"`
 }
 
 // GetURL returns the value of URL.
@@ -69,6 +71,16 @@ func (s *AddPageReq) GetTags() []string {
 	return s.Tags
 }
 
+// GetHeaders returns the value of Headers.
+func (s *AddPageReq) GetHeaders() OptAddPageReqHeaders {
+	return s.Headers
+}
+
+// GetCookies returns the value of Cookies.
+func (s *AddPageReq) GetCookies() OptAddPageReqCookies {
+	return s.Cookies
+}
+
 // SetURL sets the value of URL.
 func (s *AddPageReq) SetURL(val string) {
 	s.URL = val
@@ -87,6 +99,38 @@ func (s *AddPageReq) SetFormats(val []Format) {
 // SetTags sets the value of Tags.
 func (s *AddPageReq) SetTags(val []string) {
 	s.Tags = val
+}
+
+// SetHeaders sets the value of Headers.
+func (s *AddPageReq) SetHeaders(val OptAddPageReqHeaders) {
+	s.Headers = val
+}
+
+// SetCookies sets the value of Cookies.
+func (s *AddPageReq) SetCookies(val OptAddPageReqCookies) {
+	s.Cookies = val
+}
+
+type AddPageReqCookies map[string]string
+
+func (s *AddPageReqCookies) init() AddPageReqCookies {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
+}
+
+type AddPageReqHeaders map[string]string
+
+func (s *AddPageReqHeaders) init() AddPageReqHeaders {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
 }
 
 // Ref: #/components/schemas/error
@@ -147,6 +191,7 @@ type Format string
 const (
 	FormatAll        Format = "all"
 	FormatPdf        Format = "pdf"
+	FormatHTML       Format = "html"
 	FormatSingleFile Format = "single_file"
 	FormatHeaders    Format = "headers"
 )
@@ -156,6 +201,7 @@ func (Format) AllValues() []Format {
 	return []Format{
 		FormatAll,
 		FormatPdf,
+		FormatHTML,
 		FormatSingleFile,
 		FormatHeaders,
 	}
@@ -167,6 +213,8 @@ func (s Format) MarshalText() ([]byte, error) {
 	case FormatAll:
 		return []byte(s), nil
 	case FormatPdf:
+		return []byte(s), nil
+	case FormatHTML:
 		return []byte(s), nil
 	case FormatSingleFile:
 		return []byte(s), nil
@@ -185,6 +233,9 @@ func (s *Format) UnmarshalText(data []byte) error {
 		return nil
 	case FormatPdf:
 		*s = FormatPdf
+		return nil
+	case FormatHTML:
+		*s = FormatHTML
 		return nil
 	case FormatSingleFile:
 		*s = FormatSingleFile
@@ -295,6 +346,98 @@ func (o OptAddPageReq) Get() (v AddPageReq, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptAddPageReq) Or(d AddPageReq) AddPageReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptAddPageReqCookies returns new OptAddPageReqCookies with value set to v.
+func NewOptAddPageReqCookies(v AddPageReqCookies) OptAddPageReqCookies {
+	return OptAddPageReqCookies{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptAddPageReqCookies is optional AddPageReqCookies.
+type OptAddPageReqCookies struct {
+	Value AddPageReqCookies
+	Set   bool
+}
+
+// IsSet returns true if OptAddPageReqCookies was set.
+func (o OptAddPageReqCookies) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptAddPageReqCookies) Reset() {
+	var v AddPageReqCookies
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptAddPageReqCookies) SetTo(v AddPageReqCookies) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptAddPageReqCookies) Get() (v AddPageReqCookies, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptAddPageReqCookies) Or(d AddPageReqCookies) AddPageReqCookies {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptAddPageReqHeaders returns new OptAddPageReqHeaders with value set to v.
+func NewOptAddPageReqHeaders(v AddPageReqHeaders) OptAddPageReqHeaders {
+	return OptAddPageReqHeaders{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptAddPageReqHeaders is optional AddPageReqHeaders.
+type OptAddPageReqHeaders struct {
+	Value AddPageReqHeaders
+	Set   bool
+}
+
+// IsSet returns true if OptAddPageReqHeaders was set.
+func (o OptAddPageReqHeaders) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptAddPageReqHeaders) Reset() {
+	var v AddPageReqHeaders
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptAddPageReqHeaders) SetTo(v AddPageReqHeaders) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptAddPageReqHeaders) Get() (v AddPageReqHeaders, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptAddPageReqHeaders) Or(d AddPageReqHeaders) AddPageReqHeaders {
 	if v, ok := o.Get(); ok {
 		return v
 	}
