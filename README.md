@@ -7,6 +7,8 @@ Aimed to be a simple, fast and easy-to-use webarchive for personal or home-net u
 * **headers** — save all headers from response
 * **pdf** — save page in pdf
 * **single_file** — save html and all its resources (css,js,images) into one html file
+* **html** — save the raw HTML and download/relink external resources into separate files
+* **markdown** — save page content as clean markdown
 
 ## Requirements 
 
@@ -36,6 +38,11 @@ variables:
   * **PDF_VIEWPORT** — use specified viewport value (default `1280x720`)
   * **PDF_DPI** — use specified DPI value for the output pdf (default `150`)
   * **PDF_FILENAME** — use specified name for output pdf file (default `page.pdf`)
+* **AUTH**
+  * **AUTH_ENABLED** — Enable authentication for the API and UI (default `false`)
+  * **AUTH_BASIC_USERNAME** — Username for Basic Auth
+  * **AUTH_BASIC_PASSWORD** — Password for Basic Auth
+  * **AUTH_PROXY_HEADER** — Header to use for proxy-forwarded authentication (default `Remote-User`)
 
 
 *Note*: Prefix **WEBARCHIVE_** can be used with the environment variable names 
@@ -77,11 +84,15 @@ docker compose up -d webarchive
 curl -X POST --location "http://localhost:5001/api/v1/pages" \
     -H "Content-Type: application/json" \
     -d "{
-          \"url\": \"https://github.com/wkhtmltopdf/wkhtmltopdf/issues/1937\",
+          \"url\": \"https://example.com\",
           \"formats\": [
             \"pdf\",
-            \"headers\"
-          ]
+            \"html\"
+          ],
+          \"tags\": [\"research\"],
+          \"headers\": {
+            \"Authorization\": \"Bearer some-token\"
+          }
         }" | jq .
 ```
 
@@ -120,10 +131,10 @@ curl -X GET --location "http://localhost:5001/api/v1/pages" | jq .
 - [x] Save page to pdf 
 - [x] Save URL headers
 - [x] Save page to the single-page html
-- [ ] Save page to html with separate resource files (?)
-- [ ] Basic web UI
-- [ ] Optional authentication
-- [ ] Multi-user access
+- [x] Save page to html with separate resource files
+- [x] Save page to markdown
+- [x] Modern web UI dashboard
+- [x] Optional authentication & Multi-user access
+- [x] Tags/Categories
 - [ ] Support SQL database with or without separate files storage
-- [ ] Tags/Categories
-- [ ] Save page to markdown
+- [ ] Companion Chrome Extension for active session forwarding
