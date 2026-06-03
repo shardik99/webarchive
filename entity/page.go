@@ -12,8 +12,8 @@ import (
 )
 
 type Processor interface {
-	Process(ctx context.Context, format Format, url string, cache *Cache) Result
-	GetMeta(ctx context.Context, url string, cache *Cache) (Meta, error)
+	Process(ctx context.Context, format Format, page *Page) Result
+	GetMeta(ctx context.Context, page *Page) (Meta, error)
 }
 
 type Format uint8
@@ -22,12 +22,14 @@ const (
 	FormatHeaders Format = iota
 	FormatSingleFile
 	FormatPDF
+	FormatHTML
 )
 
 var AllFormats = []Format{
 	FormatHeaders,
 	FormatPDF,
 	FormatSingleFile,
+	FormatHTML,
 }
 
 type Status uint8
@@ -58,9 +60,11 @@ type PageBase struct {
 	Meta        Meta
 	Owner       string
 	Tags        []string
+	Headers     map[string]string
+	Cookies     map[string]string
 }
 
-func NewPage(url string, description string, tags []string, formats ...Format) *Page {
+func NewPage(url string, description string, tags []string, headers map[string]string, cookies map[string]string, formats ...Format) *Page {
 	normalizedTags := make([]string, 0, len(tags))
 	for _, t := range tags {
 		trimmed := strings.TrimSpace(t)
@@ -78,6 +82,8 @@ func NewPage(url string, description string, tags []string, formats ...Format) *
 			Created:     time.Now(),
 			Version:     1,
 			Tags:        normalizedTags,
+			Headers:     headers,
+			Cookies:     cookies,
 		},
 		cache: NewCache(),
 	}
@@ -89,12 +95,16 @@ type Page struct {
 	cache   *Cache
 }
 
+func (p *Page) Cache() *Cache {
+	return p.cache
+}
+
 func (p *Page) SetProcessing() {
 	p.Status = StatusProcessing
 }
 
 func (p *Page) Prepare(ctx context.Context, processor Processor) {
-	meta, err := processor.GetMeta(ctx, p.URL, p.cache)
+	meta, err := processor.GetMeta(ctx, p)
 	if err != nil {
 		p.Meta.Error = err.Error()
 	} else {
@@ -118,7 +128,7 @@ func (p *Page) Process(ctx context.Context, processor Processor) {
 				}
 			}()
 
-			result := processor.Process(ctx, format, p.URL, p.cache)
+			result := processor.Process(ctx, format, p)
 			results.Add(result)
 		}(format)
 	}
