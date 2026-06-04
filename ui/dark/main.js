@@ -226,6 +226,7 @@ window.addEventListener('popstate', function (event) {
         loadIndex();
     } else {
         loadPage(event.state.page);
+    }
 });
 
 
