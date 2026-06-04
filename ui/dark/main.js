@@ -225,5 +225,48 @@ window.addEventListener('popstate', function (event) {
         loadIndex();
     } else {
         loadPage(event.state.page);
-    }
 });
+
+// New Archive Logic
+function showNewArchiveModal() {
+    $('#new_archive_modal').css('display', 'flex');
+    $('#new_archive_url').val('');
+    $('#new_archive_tags').val('');
+    $('#new_archive_url').focus();
+}
+
+function hideNewArchiveModal() {
+    $('#new_archive_modal').css('display', 'none');
+}
+
+function submitNewArchive() {
+    const url = $('#new_archive_url').val().trim();
+    const tagsStr = $('#new_archive_tags').val().trim();
+    if (!url) return;
+
+    let tags = [];
+    if (tagsStr) {
+        tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
+    }
+
+    let payload = {
+        url: url,
+        tags: tags
+    };
+
+    $.ajax({
+        url: "/api/v1/pages",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(payload),
+        success: function() {
+            hideNewArchiveModal();
+            loadIndex(); // Refresh the list
+        },
+        error: function(err) {
+            console.error("Failed to add archive:", err);
+            alert("Failed to add archive. Check console.");
+        }
+    });
+}
+
