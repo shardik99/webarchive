@@ -53,7 +53,7 @@ type API struct {
 type UI struct {
 	Enabled bool   `env:"ENABLED,default=true"`
 	Prefix  string `env:"PREFIX,default=/"`
-	Theme   string `env:"THEME,default=basic"`
+	Theme   string `env:"THEME,default=dark"`
 }
 
 type DB struct {
