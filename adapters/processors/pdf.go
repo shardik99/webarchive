@@ -65,13 +65,28 @@ func (p *PDF) Process(_ context.Context, page *entity.Page) ([]entity.File, erro
 		opts.Cookie.Set(k, v)
 	}
 
-	var reader io.Reader
+	var htmlBytes []byte
 	if len(page.InlinedHTML) > 0 {
-		reader = bytes.NewReader(page.InlinedHTML)
+		htmlBytes = page.InlinedHTML
 	} else if cacheReader := page.Cache().Reader(); cacheReader != nil {
-		// Inject a <base> tag so relative links still work with raw HTML input
-		baseTag := fmt.Sprintf(`<base href="%s">`, page.URL)
-		reader = io.MultiReader(bytes.NewBufferString(baseTag), cacheReader)
+		if b, err := io.ReadAll(cacheReader); err == nil {
+			htmlBytes = b
+			// Inject a <base> tag so relative links still work with raw HTML input
+			baseTag := fmt.Sprintf(`<base href="%s">`, page.URL)
+			htmlBytes = append([]byte(baseTag), htmlBytes...)
+		}
+	}
+
+	var reader io.Reader
+	if len(htmlBytes) > 0 {
+		// wkhtmltopdf crashes on about:blank and javascript: protocols despite LoadErrorHandling=ignore
+		htmlBytes = bytes.ReplaceAll(htmlBytes, []byte(`"about:blank"`), []byte(`""`))
+		htmlBytes = bytes.ReplaceAll(htmlBytes, []byte(`'about:blank'`), []byte(`""`))
+		htmlBytes = bytes.ReplaceAll(htmlBytes, []byte(`"about:srcdoc"`), []byte(`""`))
+		htmlBytes = bytes.ReplaceAll(htmlBytes, []byte(`'about:srcdoc'`), []byte(`""`))
+		htmlBytes = bytes.ReplaceAll(htmlBytes, []byte(`"javascript:`), []byte(`"#`))
+		htmlBytes = bytes.ReplaceAll(htmlBytes, []byte(`'javascript:`), []byte(`'#`))
+		reader = bytes.NewReader(htmlBytes)
 	}
 
 	var provider wkhtmltopdf.PageProvider
