@@ -10,4 +10,5 @@ FROM surnet/alpine-wkhtmltopdf:3.17.0-0.12.6-full
 
 WORKDIR /project
 COPY --from=builder /project/service service
+ENV UI_THEME=dark
 ENTRYPOINT ["./service"]
