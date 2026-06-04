@@ -13,6 +13,13 @@ According to the initial project roadmap, several features are slated for future
 
 ## Recently Completed Features
 
+- [x] Basic tagging and categorization
+- [x] Extract metadata (title, description, icon) from pages
+- [x] Authentication support for archiving paywalled content
+- [x] HTML download alongside PDF / separate resources
+- [x] Markdown format extraction (e.g. using mozilla/readability)
+- [x] Collections and link depth crawling (depth > 1)
+
 *   **Markdown Support**: Implemented a format processor that parses the web article's main content cleanly and converts it into standard Markdown.
 *   **HTML with Separate Resources**: A new `html` format has been implemented that saves the raw HTML while traversing, downloading, and relinking all external resources into separate files within the archive.
 *   **Tags and Categories**: Added full support for tagging and categorizing archives in the backend API, BadgerDB, and UI.
