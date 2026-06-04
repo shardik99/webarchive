@@ -68,15 +68,25 @@
 <div id="new_archive_modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
     <div class="glass" style="padding: 24px; width: 400px; display: flex; flex-direction: column; gap: 16px;">
         <h3>New Archive</h3>
-        <input type="text" id="new_archive_url" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="https://example.com">
-        <input type="text" id="new_archive_tags" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="Tags (comma separated)">
-        <select id="new_archive_collection" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);">
-            <option value="" style="background: var(--bg-dark);">No Collection</option>
-        </select>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-            <input type="number" id="new_archive_depth" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="Link Depth (0 = page only)" min="0" value="0">
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            URL
+            <input type="text" id="new_archive_url" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);" placeholder="https://example.com">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Tags
+            <input type="text" id="new_archive_tags" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);" placeholder="Tags (comma separated)">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Collection
+            <select id="new_archive_collection" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);">
+                <option value="" style="background: var(--bg-dark);">No Collection</option>
+            </select>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Link Depth
+            <input type="number" id="new_archive_depth" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);" placeholder="0" min="0" value="0">
             <span style="font-size: 11px; color: var(--text-secondary);">(Note: link depth > 1 might cause large archives)</span>
-        </div>
+        </label>
         <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 14px; cursor: pointer;">
             <input type="checkbox" id="new_archive_markdown" style="width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer;">
             Include Markdown Format
@@ -92,8 +102,14 @@
 <div id="new_collection_modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
     <div class="glass" style="padding: 24px; width: 400px; display: flex; flex-direction: column; gap: 16px;">
         <h3>New Collection</h3>
-        <input type="text" id="new_collection_name" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="Collection Name">
-        <textarea id="new_collection_desc" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); min-height: 80px;" placeholder="Description"></textarea>
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Name
+            <input type="text" id="new_collection_name" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);" placeholder="Collection Name">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Description
+            <textarea id="new_collection_desc" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary); min-height: 80px;" placeholder="Description"></textarea>
+        </label>
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;">
             <button onclick="hideNewCollectionModal()" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer;">Cancel</button>
             <button onclick="submitNewCollection()" style="background: var(--accent); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Create</button>
@@ -106,9 +122,18 @@
     <div class="glass" style="padding: 24px; width: 400px; display: flex; flex-direction: column; gap: 16px;">
         <h3>Edit Archive</h3>
         <input type="hidden" id="edit_archive_id">
-        <input type="text" id="edit_archive_title" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="Title">
-        <textarea id="edit_archive_desc" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); min-height: 80px;" placeholder="Description"></textarea>
-        <input type="text" id="edit_archive_tags" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="Tags (comma separated)">
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Title
+            <input type="text" id="edit_archive_title" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);" placeholder="Title">
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Description
+            <textarea id="edit_archive_desc" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary); min-height: 80px;" placeholder="Description"></textarea>
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; color: var(--text-secondary); font-size: 14px;">
+            Tags
+            <input type="text" id="edit_archive_tags" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); color: var(--text-primary);" placeholder="Tags (comma separated)">
+        </label>
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;">
             <button onclick="hideEditArchiveModal()" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer;">Cancel</button>
             <button onclick="submitEditArchive()" style="background: var(--accent); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Save</button>
