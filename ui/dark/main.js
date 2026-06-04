@@ -10,7 +10,6 @@ function initApp() {
     // Setup View Toggles
     $('#btn_grid_view').on('click', () => setViewMode('grid'));
     $('#btn_list_view').on('click', () => setViewMode('list'));
-    $('#btn_add_archive').on('click', showNewArchiveModal);
     
     // Setup Search
     $('#search_input').on('input', function() {

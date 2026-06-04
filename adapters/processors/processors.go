@@ -19,6 +19,18 @@ import (
 
 const defaultEncoding = "utf-8"
 
+type userAgentTransport struct {
+	inner     http.RoundTripper
+	userAgent string
+}
+
+func (u *userAgentTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", u.userAgent)
+	}
+	return u.inner.RoundTrip(req)
+}
+
 type processor interface {
 	Process(ctx context.Context, page *entity.Page) ([]entity.File, error)
 }
@@ -56,6 +68,14 @@ func NewProcessors(cfg config.Config, log *zap.Logger) (*Processors, error) {
 		},
 		Jar:     jar,
 		Timeout: time.Second * 30,
+	}
+
+	// Wrap the transport to inject a standard User-Agent
+	if httpClient.Transport != nil {
+		httpClient.Transport = &userAgentTransport{
+			inner: httpClient.Transport,
+			userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 WebArchive/1.0",
+		}
 	}
 
 	procs := Processors{
@@ -150,17 +170,11 @@ func (p *Processors) GetMeta(ctx context.Context, page *entity.Page) (entity.Met
 		return entity.Meta{}, fmt.Errorf("failed to find html tag")
 	}
 
-	fc = fc.NextSibling
-	if fc == nil {
-		return entity.Meta{}, fmt.Errorf("failed to find html tag")
-	}
-
 	for fc = fc.FirstChild; fc != nil && fc.Data != "head"; fc = fc.NextSibling {
-		fmt.Println(fc.Data)
 	}
 
 	if fc == nil {
-		return entity.Meta{}, fmt.Errorf("failed to find html tag")
+		return entity.Meta{}, fmt.Errorf("failed to find head tag")
 	}
 
 	meta := entity.Meta{}
