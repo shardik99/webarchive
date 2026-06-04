@@ -59,12 +59,14 @@ type PageBase struct {
 	Status      Status
 	Meta        Meta
 	Owner       string
+	CollectionID *uuid.UUID
+	Depth       int
 	Tags        []string
 	Headers     map[string]string
 	Cookies     map[string]string
 }
 
-func NewPage(url string, description string, tags []string, headers map[string]string, cookies map[string]string, formats ...Format) *Page {
+func NewPage(url string, description string, tags []string, headers map[string]string, cookies map[string]string, collectionID *uuid.UUID, depth int, formats ...Format) *Page {
 	normalizedTags := make([]string, 0, len(tags))
 	for _, t := range tags {
 		trimmed := strings.TrimSpace(t)
@@ -81,6 +83,8 @@ func NewPage(url string, description string, tags []string, headers map[string]s
 			Formats:     formats,
 			Created:     time.Now(),
 			Version:     1,
+			CollectionID: collectionID,
+			Depth:       depth,
 			Tags:        normalizedTags,
 			Headers:     headers,
 			Cookies:     cookies,

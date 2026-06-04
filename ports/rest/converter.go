@@ -8,11 +8,27 @@ import (
 	"github.com/derfenix/webarchive/entity"
 )
 
+func CollectionToRest(col *entity.Collection) openapi.Collection {
+	return openapi.Collection{
+		ID:          col.ID,
+		Name:        col.Name,
+		Description: openapi.NewOptString(col.Description),
+		Created:     col.Created,
+	}
+}
+
 func PageToRestWithResults(page *entity.Page) openapi.PageWithResults {
 	return openapi.PageWithResults{
 		ID:      page.ID,
 		URL:     page.URL,
 		Created: page.Created,
+		Depth:   page.Depth,
+		CollectionID: func() openapi.OptNilUUID {
+			if page.CollectionID != nil {
+				return openapi.NewOptNilUUID(*page.CollectionID)
+			}
+			return openapi.OptNilUUID{}
+		}(),
 		Formats: func() []openapi.Format {
 			res := make([]openapi.Format, len(page.Formats))
 
@@ -72,6 +88,13 @@ func BasePageToRest(page *entity.PageBase) openapi.Page {
 		ID:      page.ID,
 		URL:     page.URL,
 		Created: page.Created,
+		Depth:   page.Depth,
+		CollectionID: func() openapi.OptNilUUID {
+			if page.CollectionID != nil {
+				return openapi.NewOptNilUUID(*page.CollectionID)
+			}
+			return openapi.OptNilUUID{}
+		}(),
 		Meta: openapi.PageMeta{
 			Title:       html.EscapeString(page.Meta.Title),
 			Description: html.EscapeString(page.Meta.Description),
@@ -96,6 +119,13 @@ func PageToRest(page *entity.Page) openapi.Page {
 		ID:      page.ID,
 		URL:     page.URL,
 		Created: page.Created,
+		Depth:   page.Depth,
+		CollectionID: func() openapi.OptNilUUID {
+			if page.CollectionID != nil {
+				return openapi.NewOptNilUUID(*page.CollectionID)
+			}
+			return openapi.OptNilUUID{}
+		}(),
 		Meta: openapi.PageMeta{
 			Title:       html.EscapeString(page.Meta.Title),
 			Description: html.EscapeString(page.Meta.Description),

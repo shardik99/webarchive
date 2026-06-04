@@ -8,6 +8,8 @@ According to the initial project roadmap, several features are slated for future
 
 1.  **Database Flexibility**: The system currently hardcodes BadgerDB. The architecture is flexible enough (via the `ports` and `adapters` interfaces) to support external SQL databases (like PostgreSQL or SQLite) with or without separate blob storage (like S3 or Minio).
 2.  **Companion Chrome Extension**: Developing a browser extension that allows users to easily send their currently viewed page to the archive. This extension should leverage the browser's active session to extract and forward the authenticated headers and cookies directly to the webarchive API.
+3.  **Follow Links & Link Depth**: Adding the ability to follow links from the original URL up to a configured depth. This allows users to download entire blogs or websites at once, rather than archiving pages individually.
+4.  **Collections**: Adding support for grouping multiple archived pages together into a single "Collection" (which works in tandem with the 'Follow Links' feature). The dashboard will be updated to display Collections independently, separating them from the standard Pages list.
 
 ## Recently Completed Features
 

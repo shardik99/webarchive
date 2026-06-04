@@ -8,18 +8,42 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// AddCollection implements addCollection operation.
+	//
+	// Add new collection.
+	//
+	// POST /collections
+	AddCollection(ctx context.Context, req OptAddCollectionReq) (*Collection, error)
 	// AddPage implements addPage operation.
 	//
 	// Add new page.
 	//
 	// POST /pages
 	AddPage(ctx context.Context, req OptAddPageReq, params AddPageParams) (AddPageRes, error)
+	// DeleteCollection implements deleteCollection operation.
+	//
+	// Delete a collection.
+	//
+	// DELETE /collections/{id}
+	DeleteCollection(ctx context.Context, params DeleteCollectionParams) (DeleteCollectionRes, error)
 	// DeletePage implements deletePage operation.
 	//
 	// Delete a page and its files.
 	//
 	// DELETE /pages/{id}
 	DeletePage(ctx context.Context, params DeletePageParams) (DeletePageRes, error)
+	// GetCollection implements getCollection operation.
+	//
+	// Get collection details.
+	//
+	// GET /collections/{id}
+	GetCollection(ctx context.Context, params GetCollectionParams) (GetCollectionRes, error)
+	// GetCollections implements getCollections operation.
+	//
+	// Get all collections.
+	//
+	// GET /collections
+	GetCollections(ctx context.Context) ([]Collection, error)
 	// GetFile implements getFile operation.
 	//
 	// Get file content.

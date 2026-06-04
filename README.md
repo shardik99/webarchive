@@ -138,3 +138,5 @@ curl -X GET --location "http://localhost:5001/api/v1/pages" | jq .
 - [x] Tags/Categories
 - [ ] Support SQL database with or without separate files storage
 - [ ] Companion Chrome Extension for active session forwarding
+- [ ] Follow links and link depth for recursive archival
+- [ ] Group archived pages into Collections

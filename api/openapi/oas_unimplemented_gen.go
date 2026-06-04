@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// AddCollection implements addCollection operation.
+//
+// Add new collection.
+//
+// POST /collections
+func (UnimplementedHandler) AddCollection(ctx context.Context, req OptAddCollectionReq) (r *Collection, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // AddPage implements addPage operation.
 //
 // Add new page.
@@ -22,12 +31,39 @@ func (UnimplementedHandler) AddPage(ctx context.Context, req OptAddPageReq, para
 	return r, ht.ErrNotImplemented
 }
 
+// DeleteCollection implements deleteCollection operation.
+//
+// Delete a collection.
+//
+// DELETE /collections/{id}
+func (UnimplementedHandler) DeleteCollection(ctx context.Context, params DeleteCollectionParams) (r DeleteCollectionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // DeletePage implements deletePage operation.
 //
 // Delete a page and its files.
 //
 // DELETE /pages/{id}
 func (UnimplementedHandler) DeletePage(ctx context.Context, params DeletePageParams) (r DeletePageRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetCollection implements getCollection operation.
+//
+// Get collection details.
+//
+// GET /collections/{id}
+func (UnimplementedHandler) GetCollection(ctx context.Context, params GetCollectionParams) (r GetCollectionRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// GetCollections implements getCollections operation.
+//
+// Get all collections.
+//
+// GET /collections
+func (UnimplementedHandler) GetCollections(ctx context.Context) (r []Collection, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

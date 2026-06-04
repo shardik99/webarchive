@@ -5,8 +5,16 @@ type AddPageRes interface {
 	addPageRes()
 }
 
+type DeleteCollectionRes interface {
+	deleteCollectionRes()
+}
+
 type DeletePageRes interface {
 	deletePageRes()
+}
+
+type GetCollectionRes interface {
+	getCollectionRes()
 }
 
 type GetFileRes interface {

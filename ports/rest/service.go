@@ -22,19 +22,28 @@ type Pages interface {
 	Update(ctx context.Context, page *entity.Page) error
 }
 
-func NewService(pages Pages, ch chan *entity.Page, processor entity.Processor) *Service {
+type Collections interface {
+	ListAll(ctx context.Context, owner string) ([]*entity.Collection, error)
+	Save(ctx context.Context, col *entity.Collection) error
+	Get(ctx context.Context, id uuid.UUID) (*entity.Collection, error)
+	Delete(ctx context.Context, id uuid.UUID) error
+}
+
+func NewService(pages Pages, cols Collections, ch chan *entity.Page, processor entity.Processor) *Service {
 	return &Service{
-		pages:     pages,
-		ch:        ch,
-		processor: processor,
+		pages:       pages,
+		collections: cols,
+		ch:          ch,
+		processor:   processor,
 	}
 }
 
 type Service struct {
 	openapi.UnimplementedHandler
-	processor entity.Processor
-	pages     Pages
-	ch        chan *entity.Page
+	processor   entity.Processor
+	pages       Pages
+	collections Collections
+	ch          chan *entity.Page
 }
 
 func (s *Service) GetPage(ctx context.Context, params openapi.GetPageParams) (openapi.GetPageRes, error) {
@@ -99,7 +108,18 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 		cookies = req.Value.Cookies.Value
 	}
 
-	page := entity.NewPage(url, description, tags, headers, cookies, domainFormats...)
+	var collectionID *uuid.UUID
+	if req.Value.CollectionID.IsSet() && !req.Value.CollectionID.Null {
+		cid := req.Value.CollectionID.Value
+		collectionID = &cid
+	}
+
+	depth := 0
+	if req.Value.Depth.IsSet() {
+		depth = req.Value.Depth.Value
+	}
+
+	page := entity.NewPage(url, description, tags, headers, cookies, collectionID, depth, domainFormats...)
 	page.Owner = OwnerFromContext(ctx)
 	page.Status = entity.StatusNew
 	page.Prepare(ctx, s.processor)
@@ -190,6 +210,59 @@ func (s *Service) UpdatePage(ctx context.Context, req openapi.OptUpdatePageReq, 
 
 	restPage := PageToRest(page)
 	return &restPage, nil
+}
+
+func (s *Service) AddCollection(ctx context.Context, req openapi.OptAddCollectionReq) (*openapi.Collection, error) {
+	name := req.Value.Name
+	desc := ""
+	if req.Value.Description.IsSet() {
+		desc = req.Value.Description.Value
+	}
+
+	col := entity.NewCollection(name, desc, OwnerFromContext(ctx))
+
+	if err := s.collections.Save(ctx, col); err != nil {
+		return nil, fmt.Errorf("save collection: %w", err)
+	}
+
+	res := CollectionToRest(col)
+	return &res, nil
+}
+
+func (s *Service) GetCollections(ctx context.Context) ([]openapi.Collection, error) {
+	cols, err := s.collections.ListAll(ctx, OwnerFromContext(ctx))
+	if err != nil {
+		return nil, fmt.Errorf("list collections: %w", err)
+	}
+
+	res := make([]openapi.Collection, len(cols))
+	for i := range res {
+		res[i] = CollectionToRest(cols[i])
+	}
+	return res, nil
+}
+
+func (s *Service) GetCollection(ctx context.Context, params openapi.GetCollectionParams) (openapi.GetCollectionRes, error) {
+	col, err := s.collections.Get(ctx, params.ID)
+	if err != nil || col.Owner != OwnerFromContext(ctx) {
+		return &openapi.GetCollectionNotFound{}, nil
+	}
+
+	res := CollectionToRest(col)
+	return &res, nil
+}
+
+func (s *Service) DeleteCollection(ctx context.Context, params openapi.DeleteCollectionParams) (openapi.DeleteCollectionRes, error) {
+	col, err := s.collections.Get(ctx, params.ID)
+	if err != nil || col.Owner != OwnerFromContext(ctx) {
+		return &openapi.DeleteCollectionNotFound{}, nil
+	}
+
+	if err := s.collections.Delete(ctx, params.ID); err != nil {
+		return nil, fmt.Errorf("delete collection: %w", err)
+	}
+
+	return &openapi.DeleteCollectionNoContent{}, nil
 }
 
 func (s *Service) NewError(_ context.Context, err error) *openapi.ErrorStatusCode {

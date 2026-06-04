@@ -18,7 +18,7 @@ func TestPDF_Process(t *testing.T) {
 		t.Skip("skip test with external resource")
 	}
 
-	page := entity.NewPage("https://github.com/SebastiaanKlippert/go-wkhtmltopdf", "", nil, nil, nil)
+	page := entity.NewPage("https://github.com/SebastiaanKlippert/go-wkhtmltopdf", "", nil, nil, nil, nil, 0)
 	files, err := (&PDF{}).Process(context.Background(), page)
 	require.NoError(t, err)
 	require.Len(t, files, 1)

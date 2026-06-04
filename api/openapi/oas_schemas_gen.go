@@ -15,6 +15,31 @@ func (s *ErrorStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
+type AddCollectionReq struct {
+	Name        string    `json:"name"`
+	Description OptString `json:"description"`
+}
+
+// GetName returns the value of Name.
+func (s *AddCollectionReq) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *AddCollectionReq) GetDescription() OptString {
+	return s.Description
+}
+
+// SetName sets the value of Name.
+func (s *AddCollectionReq) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *AddCollectionReq) SetDescription(val OptString) {
+	s.Description = val
+}
+
 type AddPageBadRequest struct {
 	Field string `json:"field"`
 	Error string `json:"error"`
@@ -43,12 +68,15 @@ func (s *AddPageBadRequest) SetError(val string) {
 func (*AddPageBadRequest) addPageRes() {}
 
 type AddPageReq struct {
-	URL         string               `json:"url"`
-	Description OptString            `json:"description"`
-	Formats     []Format             `json:"formats"`
-	Tags        []string             `json:"tags"`
-	Headers     OptAddPageReqHeaders `json:"headers"`
-	Cookies     OptAddPageReqCookies `json:"cookies"`
+	URL          string     `json:"url"`
+	Description  OptString  `json:"description"`
+	Formats      []Format   `json:"formats"`
+	Tags         []string   `json:"tags"`
+	CollectionID OptNilUUID `json:"collection_id"`
+	// Note: link depth > 1 might cause large archives.
+	Depth   OptInt               `json:"depth"`
+	Headers OptAddPageReqHeaders `json:"headers"`
+	Cookies OptAddPageReqCookies `json:"cookies"`
 }
 
 // GetURL returns the value of URL.
@@ -69,6 +97,16 @@ func (s *AddPageReq) GetFormats() []Format {
 // GetTags returns the value of Tags.
 func (s *AddPageReq) GetTags() []string {
 	return s.Tags
+}
+
+// GetCollectionID returns the value of CollectionID.
+func (s *AddPageReq) GetCollectionID() OptNilUUID {
+	return s.CollectionID
+}
+
+// GetDepth returns the value of Depth.
+func (s *AddPageReq) GetDepth() OptInt {
+	return s.Depth
 }
 
 // GetHeaders returns the value of Headers.
@@ -99,6 +137,16 @@ func (s *AddPageReq) SetFormats(val []Format) {
 // SetTags sets the value of Tags.
 func (s *AddPageReq) SetTags(val []string) {
 	s.Tags = val
+}
+
+// SetCollectionID sets the value of CollectionID.
+func (s *AddPageReq) SetCollectionID(val OptNilUUID) {
+	s.CollectionID = val
+}
+
+// SetDepth sets the value of Depth.
+func (s *AddPageReq) SetDepth(val OptInt) {
+	s.Depth = val
 }
 
 // SetHeaders sets the value of Headers.
@@ -132,6 +180,66 @@ func (s *AddPageReqHeaders) init() AddPageReqHeaders {
 	}
 	return m
 }
+
+// Ref: #/components/schemas/collection
+type Collection struct {
+	ID          uuid.UUID `json:"id"`
+	Name        string    `json:"name"`
+	Description OptString `json:"description"`
+	Created     time.Time `json:"created"`
+}
+
+// GetID returns the value of ID.
+func (s *Collection) GetID() uuid.UUID {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *Collection) GetName() string {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *Collection) GetDescription() OptString {
+	return s.Description
+}
+
+// GetCreated returns the value of Created.
+func (s *Collection) GetCreated() time.Time {
+	return s.Created
+}
+
+// SetID sets the value of ID.
+func (s *Collection) SetID(val uuid.UUID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *Collection) SetName(val string) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *Collection) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetCreated sets the value of Created.
+func (s *Collection) SetCreated(val time.Time) {
+	s.Created = val
+}
+
+func (*Collection) getCollectionRes() {}
+
+// DeleteCollectionNoContent is response for DeleteCollection operation.
+type DeleteCollectionNoContent struct{}
+
+func (*DeleteCollectionNoContent) deleteCollectionRes() {}
+
+// DeleteCollectionNotFound is response for DeleteCollection operation.
+type DeleteCollectionNotFound struct{}
+
+func (*DeleteCollectionNotFound) deleteCollectionRes() {}
 
 // DeletePageNoContent is response for DeletePage operation.
 type DeletePageNoContent struct{}
@@ -258,6 +366,11 @@ func (s *Format) UnmarshalText(data []byte) error {
 	}
 }
 
+// GetCollectionNotFound is response for GetCollection operation.
+type GetCollectionNotFound struct{}
+
+func (*GetCollectionNotFound) getCollectionRes() {}
+
 // GetFileNotFound is response for GetFile operation.
 type GetFileNotFound struct{}
 
@@ -315,6 +428,52 @@ func (*GetFileOKTextPlain) getFileRes() {}
 type GetPageNotFound struct{}
 
 func (*GetPageNotFound) getPageRes() {}
+
+// NewOptAddCollectionReq returns new OptAddCollectionReq with value set to v.
+func NewOptAddCollectionReq(v AddCollectionReq) OptAddCollectionReq {
+	return OptAddCollectionReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptAddCollectionReq is optional AddCollectionReq.
+type OptAddCollectionReq struct {
+	Value AddCollectionReq
+	Set   bool
+}
+
+// IsSet returns true if OptAddCollectionReq was set.
+func (o OptAddCollectionReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptAddCollectionReq) Reset() {
+	var v AddCollectionReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptAddCollectionReq) SetTo(v AddCollectionReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptAddCollectionReq) Get() (v AddCollectionReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptAddCollectionReq) Or(d AddCollectionReq) AddCollectionReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
 
 // NewOptAddPageReq returns new OptAddPageReq with value set to v.
 func NewOptAddPageReq(v AddPageReq) OptAddPageReq {
@@ -454,6 +613,115 @@ func (o OptAddPageReqHeaders) Or(d AddPageReqHeaders) AddPageReqHeaders {
 	return d
 }
 
+// NewOptInt returns new OptInt with value set to v.
+func NewOptInt(v int) OptInt {
+	return OptInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt is optional int.
+type OptInt struct {
+	Value int
+	Set   bool
+}
+
+// IsSet returns true if OptInt was set.
+func (o OptInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt) SetTo(v int) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt) Get() (v int, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilUUID returns new OptNilUUID with value set to v.
+func NewOptNilUUID(v uuid.UUID) OptNilUUID {
+	return OptNilUUID{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilUUID is optional nullable uuid.UUID.
+type OptNilUUID struct {
+	Value uuid.UUID
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilUUID was set.
+func (o OptNilUUID) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilUUID) Reset() {
+	var v uuid.UUID
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilUUID) SetTo(v uuid.UUID) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsSet returns true if value is Null.
+func (o OptNilUUID) IsNull() bool { return o.Null }
+
+// SetNull sets value to null.
+func (o *OptNilUUID) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v uuid.UUID
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilUUID) Get() (v uuid.UUID, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilUUID) Or(d uuid.UUID) uuid.UUID {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -548,13 +816,15 @@ func (o OptUpdatePageReq) Or(d UpdatePageReq) UpdatePageReq {
 
 // Ref: #/components/schemas/page
 type Page struct {
-	ID      uuid.UUID `json:"id"`
-	URL     string    `json:"url"`
-	Created time.Time `json:"created"`
-	Formats []Format  `json:"formats"`
-	Tags    []string  `json:"tags"`
-	Status  Status    `json:"status"`
-	Meta    PageMeta  `json:"meta"`
+	ID           uuid.UUID  `json:"id"`
+	URL          string     `json:"url"`
+	Created      time.Time  `json:"created"`
+	CollectionID OptNilUUID `json:"collection_id"`
+	Depth        int        `json:"depth"`
+	Formats      []Format   `json:"formats"`
+	Tags         []string   `json:"tags"`
+	Status       Status     `json:"status"`
+	Meta         PageMeta   `json:"meta"`
 }
 
 // GetID returns the value of ID.
@@ -570,6 +840,16 @@ func (s *Page) GetURL() string {
 // GetCreated returns the value of Created.
 func (s *Page) GetCreated() time.Time {
 	return s.Created
+}
+
+// GetCollectionID returns the value of CollectionID.
+func (s *Page) GetCollectionID() OptNilUUID {
+	return s.CollectionID
+}
+
+// GetDepth returns the value of Depth.
+func (s *Page) GetDepth() int {
+	return s.Depth
 }
 
 // GetFormats returns the value of Formats.
@@ -605,6 +885,16 @@ func (s *Page) SetURL(val string) {
 // SetCreated sets the value of Created.
 func (s *Page) SetCreated(val time.Time) {
 	s.Created = val
+}
+
+// SetCollectionID sets the value of CollectionID.
+func (s *Page) SetCollectionID(val OptNilUUID) {
+	s.CollectionID = val
+}
+
+// SetDepth sets the value of Depth.
+func (s *Page) SetDepth(val int) {
+	s.Depth = val
 }
 
 // SetFormats sets the value of Formats.
@@ -669,14 +959,16 @@ func (s *PageMeta) SetError(val OptString) {
 // Merged schema.
 // Ref: #/components/schemas/pageWithResults
 type PageWithResults struct {
-	ID      uuid.UUID           `json:"id"`
-	URL     string              `json:"url"`
-	Created time.Time           `json:"created"`
-	Formats []Format            `json:"formats"`
-	Tags    []string            `json:"tags"`
-	Status  Status              `json:"status"`
-	Meta    PageWithResultsMeta `json:"meta"`
-	Results []Result            `json:"results"`
+	ID           uuid.UUID           `json:"id"`
+	URL          string              `json:"url"`
+	Created      time.Time           `json:"created"`
+	CollectionID OptNilUUID          `json:"collection_id"`
+	Depth        int                 `json:"depth"`
+	Formats      []Format            `json:"formats"`
+	Tags         []string            `json:"tags"`
+	Status       Status              `json:"status"`
+	Meta         PageWithResultsMeta `json:"meta"`
+	Results      []Result            `json:"results"`
 }
 
 // GetID returns the value of ID.
@@ -692,6 +984,16 @@ func (s *PageWithResults) GetURL() string {
 // GetCreated returns the value of Created.
 func (s *PageWithResults) GetCreated() time.Time {
 	return s.Created
+}
+
+// GetCollectionID returns the value of CollectionID.
+func (s *PageWithResults) GetCollectionID() OptNilUUID {
+	return s.CollectionID
+}
+
+// GetDepth returns the value of Depth.
+func (s *PageWithResults) GetDepth() int {
+	return s.Depth
 }
 
 // GetFormats returns the value of Formats.
@@ -732,6 +1034,16 @@ func (s *PageWithResults) SetURL(val string) {
 // SetCreated sets the value of Created.
 func (s *PageWithResults) SetCreated(val time.Time) {
 	s.Created = val
+}
+
+// SetCollectionID sets the value of CollectionID.
+func (s *PageWithResults) SetCollectionID(val OptNilUUID) {
+	s.CollectionID = val
+}
+
+// SetDepth sets the value of Depth.
+func (s *PageWithResults) SetDepth(val int) {
+	s.Depth = val
 }
 
 // SetFormats sets the value of Formats.

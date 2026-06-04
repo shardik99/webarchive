@@ -40,6 +40,11 @@ func NewApplication(cfg config.Config) (Application, error) {
 		return Application{}, fmt.Errorf("new page repo: %w", err)
 	}
 
+	collectionRepo, err := badgerRepo.NewCollection(db)
+	if err != nil {
+		return Application{}, fmt.Errorf("new collection repo: %w", err)
+	}
+
 	processor, err := processors.NewProcessors(cfg, log.Named("processor"))
 	if err != nil {
 		return Application{}, fmt.Errorf("new processors: %w", err)
@@ -49,7 +54,7 @@ func NewApplication(cfg config.Config) (Application, error) {
 	worker := entity.NewWorker(workerCh, pageRepo, processor, log.Named("worker"))
 
 	server, err := openapi.NewServer(
-		rest.NewService(pageRepo, workerCh, processor),
+		rest.NewService(pageRepo, collectionRepo, workerCh, processor),
 		openapi.WithPathPrefix("/api/v1"),
 		openapi.WithMiddleware(
 			func(r middleware.Request, next middleware.Next) (middleware.Response, error) {
@@ -110,7 +115,8 @@ func NewApplication(cfg config.Config) (Application, error) {
 		httpServer: &httpServer,
 		worker:     worker,
 
-		pageRepo: pageRepo,
+		pageRepo:       pageRepo,
+		collectionRepo: collectionRepo,
 	}, nil
 }
 
@@ -123,6 +129,7 @@ type Application struct {
 	worker     *entity.Worker
 
 	pageRepo *badgerRepo.Page
+	collectionRepo *badgerRepo.Collection
 }
 
 func (a *Application) Log() *zap.Logger {

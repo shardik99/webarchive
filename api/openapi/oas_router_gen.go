@@ -49,88 +49,150 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/pages"
-			if l := len("/pages"); len(elem) >= l && elem[0:l] == "/pages" {
+		case '/': // Prefix: "/"
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch r.Method {
-				case "GET":
-					s.handleGetPagesRequest([0]string{}, elemIsEscaped, w, r)
-				case "POST":
-					s.handleAddPageRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, "GET,POST")
-				}
-
-				return
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			case 'c': // Prefix: "collections"
+				if l := len("collections"); len(elem) >= l && elem[0:l] == "collections" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "id"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
 				if len(elem) == 0 {
 					switch r.Method {
-					case "DELETE":
-						s.handleDeletePageRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
 					case "GET":
-						s.handleGetPageRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
-					case "PATCH":
-						s.handleUpdatePageRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
+						s.handleGetCollectionsRequest([0]string{}, elemIsEscaped, w, r)
+					case "POST":
+						s.handleAddCollectionRequest([0]string{}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "DELETE,GET,PATCH")
+						s.notAllowed(w, r, "GET,POST")
 					}
 
 					return
 				}
 				switch elem[0] {
-				case '/': // Prefix: "/file/"
-					if l := len("/file/"); len(elem) >= l && elem[0:l] == "/file/" {
+				case '/': // Prefix: "/"
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
-					// Param: "file_id"
+					// Param: "id"
 					// Leaf parameter
-					args[1] = elem
+					args[0] = elem
 					elem = ""
 
 					if len(elem) == 0 {
 						// Leaf node.
 						switch r.Method {
-						case "GET":
-							s.handleGetFileRequest([2]string{
+						case "DELETE":
+							s.handleDeleteCollectionRequest([1]string{
 								args[0],
-								args[1],
+							}, elemIsEscaped, w, r)
+						case "GET":
+							s.handleGetCollectionRequest([1]string{
+								args[0],
 							}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "GET")
+							s.notAllowed(w, r, "DELETE,GET")
 						}
 
 						return
+					}
+				}
+			case 'p': // Prefix: "pages"
+				if l := len("pages"); len(elem) >= l && elem[0:l] == "pages" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					switch r.Method {
+					case "GET":
+						s.handleGetPagesRequest([0]string{}, elemIsEscaped, w, r)
+					case "POST":
+						s.handleAddPageRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET,POST")
+					}
+
+					return
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						switch r.Method {
+						case "DELETE":
+							s.handleDeletePageRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						case "GET":
+							s.handleGetPageRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						case "PATCH":
+							s.handleUpdatePageRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "DELETE,GET,PATCH")
+						}
+
+						return
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/file/"
+						if l := len("/file/"); len(elem) >= l && elem[0:l] == "/file/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						// Param: "file_id"
+						// Leaf parameter
+						args[1] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetFileRequest([2]string{
+									args[0],
+									args[1],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
 					}
 				}
 			}
@@ -214,108 +276,187 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/pages"
-			if l := len("/pages"); len(elem) >= l && elem[0:l] == "/pages" {
+		case '/': // Prefix: "/"
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch method {
-				case "GET":
-					r.name = "GetPages"
-					r.summary = "Get all pages"
-					r.operationID = "getPages"
-					r.pathPattern = "/pages"
-					r.args = args
-					r.count = 0
-					return r, true
-				case "POST":
-					r.name = "AddPage"
-					r.summary = "Add new page"
-					r.operationID = "addPage"
-					r.pathPattern = "/pages"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
-				}
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			case 'c': // Prefix: "collections"
+				if l := len("collections"); len(elem) >= l && elem[0:l] == "collections" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "id"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
 				if len(elem) == 0 {
 					switch method {
-					case "DELETE":
-						r.name = "DeletePage"
-						r.summary = ""
-						r.operationID = "deletePage"
-						r.pathPattern = "/pages/{id}"
-						r.args = args
-						r.count = 1
-						return r, true
 					case "GET":
-						r.name = "GetPage"
-						r.summary = ""
-						r.operationID = "getPage"
-						r.pathPattern = "/pages/{id}"
+						r.name = "GetCollections"
+						r.summary = "Get all collections"
+						r.operationID = "getCollections"
+						r.pathPattern = "/collections"
 						r.args = args
-						r.count = 1
+						r.count = 0
 						return r, true
-					case "PATCH":
-						r.name = "UpdatePage"
-						r.summary = ""
-						r.operationID = "updatePage"
-						r.pathPattern = "/pages/{id}"
+					case "POST":
+						r.name = "AddCollection"
+						r.summary = "Add new collection"
+						r.operationID = "addCollection"
+						r.pathPattern = "/collections"
 						r.args = args
-						r.count = 1
+						r.count = 0
 						return r, true
 					default:
 						return
 					}
 				}
 				switch elem[0] {
-				case '/': // Prefix: "/file/"
-					if l := len("/file/"); len(elem) >= l && elem[0:l] == "/file/" {
+				case '/': // Prefix: "/"
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
-					// Param: "file_id"
+					// Param: "id"
 					// Leaf parameter
-					args[1] = elem
+					args[0] = elem
 					elem = ""
 
 					if len(elem) == 0 {
 						switch method {
-						case "GET":
-							// Leaf: GetFile
-							r.name = "GetFile"
+						case "DELETE":
+							// Leaf: DeleteCollection
+							r.name = "DeleteCollection"
 							r.summary = ""
-							r.operationID = "getFile"
-							r.pathPattern = "/pages/{id}/file/{file_id}"
+							r.operationID = "deleteCollection"
+							r.pathPattern = "/collections/{id}"
 							r.args = args
-							r.count = 2
+							r.count = 1
+							return r, true
+						case "GET":
+							// Leaf: GetCollection
+							r.name = "GetCollection"
+							r.summary = ""
+							r.operationID = "getCollection"
+							r.pathPattern = "/collections/{id}"
+							r.args = args
+							r.count = 1
 							return r, true
 						default:
 							return
+						}
+					}
+				}
+			case 'p': // Prefix: "pages"
+				if l := len("pages"); len(elem) >= l && elem[0:l] == "pages" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					switch method {
+					case "GET":
+						r.name = "GetPages"
+						r.summary = "Get all pages"
+						r.operationID = "getPages"
+						r.pathPattern = "/pages"
+						r.args = args
+						r.count = 0
+						return r, true
+					case "POST":
+						r.name = "AddPage"
+						r.summary = "Add new page"
+						r.operationID = "addPage"
+						r.pathPattern = "/pages"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Match until "/"
+					idx := strings.IndexByte(elem, '/')
+					if idx < 0 {
+						idx = len(elem)
+					}
+					args[0] = elem[:idx]
+					elem = elem[idx:]
+
+					if len(elem) == 0 {
+						switch method {
+						case "DELETE":
+							r.name = "DeletePage"
+							r.summary = ""
+							r.operationID = "deletePage"
+							r.pathPattern = "/pages/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						case "GET":
+							r.name = "GetPage"
+							r.summary = ""
+							r.operationID = "getPage"
+							r.pathPattern = "/pages/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						case "PATCH":
+							r.name = "UpdatePage"
+							r.summary = ""
+							r.operationID = "updatePage"
+							r.pathPattern = "/pages/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						default:
+							return
+						}
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/file/"
+						if l := len("/file/"); len(elem) >= l && elem[0:l] == "/file/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						// Param: "file_id"
+						// Leaf parameter
+						args[1] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							switch method {
+							case "GET":
+								// Leaf: GetFile
+								r.name = "GetFile"
+								r.summary = ""
+								r.operationID = "getFile"
+								r.pathPattern = "/pages/{id}/file/{file_id}"
+								r.args = args
+								r.count = 2
+								return r, true
+							default:
+								return
+							}
 						}
 					}
 				}
