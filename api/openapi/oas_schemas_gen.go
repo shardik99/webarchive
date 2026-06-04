@@ -392,37 +392,37 @@ func (s GetFileOKApplicationPdf) Read(p []byte) (n int, err error) {
 
 func (*GetFileOKApplicationPdf) getFileRes() {}
 
-type GetFileOKTextHTML struct {
+type GetFileOKTextHTMLCharsetUtf8 struct {
 	Data io.Reader
 }
 
 // Read reads data from the Data reader.
 //
 // Kept to satisfy the io.Reader interface.
-func (s GetFileOKTextHTML) Read(p []byte) (n int, err error) {
+func (s GetFileOKTextHTMLCharsetUtf8) Read(p []byte) (n int, err error) {
 	if s.Data == nil {
 		return 0, io.EOF
 	}
 	return s.Data.Read(p)
 }
 
-func (*GetFileOKTextHTML) getFileRes() {}
+func (*GetFileOKTextHTMLCharsetUtf8) getFileRes() {}
 
-type GetFileOKTextPlain struct {
+type GetFileOKTextPlainCharsetUtf8 struct {
 	Data io.Reader
 }
 
 // Read reads data from the Data reader.
 //
 // Kept to satisfy the io.Reader interface.
-func (s GetFileOKTextPlain) Read(p []byte) (n int, err error) {
+func (s GetFileOKTextPlainCharsetUtf8) Read(p []byte) (n int, err error) {
 	if s.Data == nil {
 		return 0, io.EOF
 	}
 	return s.Data.Read(p)
 }
 
-func (*GetFileOKTextPlain) getFileRes() {}
+func (*GetFileOKTextPlainCharsetUtf8) getFileRes() {}
 
 // GetPageNotFound is response for GetPage operation.
 type GetPageNotFound struct{}

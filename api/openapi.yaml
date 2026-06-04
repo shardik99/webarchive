@@ -275,10 +275,11 @@ paths:
           description: File content
           content:
             application/pdf: {}
-            text/plain:
+            "text/plain; charset=utf-8":
               schema:
                 type: string
-            text/html:
+                format: binary
+            "text/html; charset=utf-8":
               schema:
                 type: string
         404:

@@ -526,7 +526,7 @@ func decodeGetFileResponse(resp *http.Response) (res GetFileRes, _ error) {
 				return res, err
 			}
 
-			response := GetFileOKTextHTML{Data: bytes.NewReader(b)}
+			response := GetFileOKTextHTMLCharsetUtf8{Data: bytes.NewReader(b)}
 			return &response, nil
 		case ct == "text/plain":
 			reader := resp.Body
@@ -535,7 +535,7 @@ func decodeGetFileResponse(resp *http.Response) (res GetFileRes, _ error) {
 				return res, err
 			}
 
-			response := GetFileOKTextPlain{Data: bytes.NewReader(b)}
+			response := GetFileOKTextPlainCharsetUtf8{Data: bytes.NewReader(b)}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)

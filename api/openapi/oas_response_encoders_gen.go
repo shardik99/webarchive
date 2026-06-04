@@ -157,7 +157,7 @@ func encodeGetFileResponse(response GetFileRes, w http.ResponseWriter, span trac
 
 		return nil
 
-	case *GetFileOKTextHTML:
+	case *GetFileOKTextHTMLCharsetUtf8:
 		w.Header().Set("Content-Type", "text/html")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -169,7 +169,7 @@ func encodeGetFileResponse(response GetFileRes, w http.ResponseWriter, span trac
 
 		return nil
 
-	case *GetFileOKTextPlain:
+	case *GetFileOKTextPlainCharsetUtf8:
 		w.Header().Set("Content-Type", "text/plain")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))

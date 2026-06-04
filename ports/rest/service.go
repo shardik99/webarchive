@@ -165,10 +165,10 @@ func (s *Service) GetFile(ctx context.Context, params openapi.GetFileParams) (op
 		return &openapi.GetFileOKApplicationPdf{Data: bytes.NewReader(file.Data)}, nil
 
 	case strings.HasPrefix(file.MimeType, "text/plain"):
-		return &openapi.GetFileOKTextPlain{Data: bytes.NewReader(file.Data)}, nil
+		return &openapi.GetFileOKTextPlainCharsetUtf8{Data: bytes.NewReader(file.Data)}, nil
 
 	case strings.HasPrefix(file.MimeType, "text/html"):
-		return &openapi.GetFileOKTextHTML{Data: bytes.NewReader(file.Data)}, nil
+		return &openapi.GetFileOKTextHTMLCharsetUtf8{Data: bytes.NewReader(file.Data)}, nil
 
 	default:
 		return nil, fmt.Errorf("unsupported mimetype: %s", file.MimeType)
