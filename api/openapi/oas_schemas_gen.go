@@ -68,11 +68,12 @@ func (s *AddPageBadRequest) SetError(val string) {
 func (*AddPageBadRequest) addPageRes() {}
 
 type AddPageReq struct {
-	URL          string     `json:"url"`
-	Description  OptString  `json:"description"`
-	Formats      []Format   `json:"formats"`
-	Tags         []string   `json:"tags"`
-	CollectionID OptNilUUID `json:"collection_id"`
+	URL            string     `json:"url"`
+	Description    OptString  `json:"description"`
+	Formats        []Format   `json:"formats"`
+	SublinkFormats []Format   `json:"sublink_formats"`
+	Tags           []string   `json:"tags"`
+	CollectionID   OptNilUUID `json:"collection_id"`
 	// Note: link depth > 1 might cause large archives.
 	Depth   OptInt               `json:"depth"`
 	Headers OptAddPageReqHeaders `json:"headers"`
@@ -92,6 +93,11 @@ func (s *AddPageReq) GetDescription() OptString {
 // GetFormats returns the value of Formats.
 func (s *AddPageReq) GetFormats() []Format {
 	return s.Formats
+}
+
+// GetSublinkFormats returns the value of SublinkFormats.
+func (s *AddPageReq) GetSublinkFormats() []Format {
+	return s.SublinkFormats
 }
 
 // GetTags returns the value of Tags.
@@ -132,6 +138,11 @@ func (s *AddPageReq) SetDescription(val OptString) {
 // SetFormats sets the value of Formats.
 func (s *AddPageReq) SetFormats(val []Format) {
 	s.Formats = val
+}
+
+// SetSublinkFormats sets the value of SublinkFormats.
+func (s *AddPageReq) SetSublinkFormats(val []Format) {
+	s.SublinkFormats = val
 }
 
 // SetTags sets the value of Tags.

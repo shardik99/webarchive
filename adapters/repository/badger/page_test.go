@@ -43,7 +43,7 @@ func TestSite(t *testing.T) {
 	t.Run("base path", func(t *testing.T) {
 		t.Parallel()
 
-		site := entity.NewPage("https://google.com", "Save all google", nil, nil, nil, nil, 0, entity.FormatPDF, entity.FormatSingleFile)
+		site := entity.NewPage("https://google.com", "Save all google", nil, nil, nil, nil, 0, nil, entity.FormatPDF, entity.FormatSingleFile)
 		site.Created = site.Created.Truncate(time.Microsecond)
 
 		err := siteRepo.Save(ctx, site)

@@ -71,6 +71,10 @@ paths:
                   type: array
                   items:
                     $ref: '#/components/schemas/format'
+                sublink_formats:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/format'
                 tags:
                   type: array
                   items:

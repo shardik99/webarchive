@@ -60,13 +60,15 @@ type PageBase struct {
 	Meta        Meta
 	Owner       string
 	CollectionID *uuid.UUID
-	Depth       int
-	Tags        []string
-	Headers     map[string]string
-	Cookies     map[string]string
+	Depth          int
+	Tags           []string
+	Headers        map[string]string
+	Cookies        map[string]string
+	SublinkFormats []Format
+	InlinedHTML    []byte
 }
 
-func NewPage(url string, description string, tags []string, headers map[string]string, cookies map[string]string, collectionID *uuid.UUID, depth int, formats ...Format) *Page {
+func NewPage(url string, description string, tags []string, headers map[string]string, cookies map[string]string, collectionID *uuid.UUID, depth int, sublinkFormats []Format, formats ...Format) *Page {
 	normalizedTags := make([]string, 0, len(tags))
 	for _, t := range tags {
 		trimmed := strings.TrimSpace(t)
@@ -77,17 +79,18 @@ func NewPage(url string, description string, tags []string, headers map[string]s
 
 	return &Page{
 		PageBase: PageBase{
-			ID:          uuid.New(),
-			URL:         url,
-			Description: description,
-			Formats:     formats,
-			Created:     time.Now(),
-			Version:     1,
-			CollectionID: collectionID,
-			Depth:       depth,
-			Tags:        normalizedTags,
-			Headers:     headers,
-			Cookies:     cookies,
+			ID:             uuid.New(),
+			URL:            url,
+			Description:    description,
+			Formats:        formats,
+			Created:        time.Now(),
+			Version:        1,
+			CollectionID:   collectionID,
+			Depth:          depth,
+			Tags:           normalizedTags,
+			Headers:        headers,
+			Cookies:        cookies,
+			SublinkFormats: sublinkFormats,
 		},
 		cache: NewCache(),
 	}
@@ -117,12 +120,25 @@ func (p *Page) Prepare(ctx context.Context, processor Processor) {
 }
 
 func (p *Page) Process(ctx context.Context, processor Processor) {
-	innerWG := sync.WaitGroup{}
-	innerWG.Add(len(p.Formats))
-
 	results := Results{}
+	var remainingFormats []Format
 
 	for _, format := range p.Formats {
+		if format == FormatSingleFile {
+			result := processor.Process(ctx, format, p)
+			results.Add(result)
+			if result.Err == nil && len(result.Files) > 0 {
+				p.InlinedHTML = result.Files[0].Data
+			}
+		} else {
+			remainingFormats = append(remainingFormats, format)
+		}
+	}
+
+	innerWG := sync.WaitGroup{}
+	innerWG.Add(len(remainingFormats))
+
+	for _, format := range remainingFormats {
 		go func(format Format) {
 			defer innerWG.Done()
 

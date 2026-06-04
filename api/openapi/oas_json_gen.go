@@ -270,6 +270,16 @@ func (s *AddPageReq) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.SublinkFormats != nil {
+			e.FieldStart("sublink_formats")
+			e.ArrStart()
+			for _, elem := range s.SublinkFormats {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		if s.Tags != nil {
 			e.FieldStart("tags")
 			e.ArrStart()
@@ -305,15 +315,16 @@ func (s *AddPageReq) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfAddPageReq = [8]string{
+var jsonFieldsNameOfAddPageReq = [9]string{
 	0: "url",
 	1: "description",
 	2: "formats",
-	3: "tags",
-	4: "collection_id",
-	5: "depth",
-	6: "headers",
-	7: "cookies",
+	3: "sublink_formats",
+	4: "tags",
+	5: "collection_id",
+	6: "depth",
+	7: "headers",
+	8: "cookies",
 }
 
 // Decode decodes AddPageReq from json.
@@ -321,7 +332,7 @@ func (s *AddPageReq) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode AddPageReq to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 	s.setDefaults()
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -364,6 +375,23 @@ func (s *AddPageReq) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"formats\"")
+			}
+		case "sublink_formats":
+			if err := func() error {
+				s.SublinkFormats = make([]Format, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem Format
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.SublinkFormats = append(s.SublinkFormats, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sublink_formats\"")
 			}
 		case "tags":
 			if err := func() error {
@@ -433,8 +461,9 @@ func (s *AddPageReq) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b00000001,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

@@ -1,8 +1,10 @@
 package processors
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/SebastiaanKlippert/go-wkhtmltopdf"
@@ -63,7 +65,23 @@ func (p *PDF) Process(_ context.Context, page *entity.Page) ([]entity.File, erro
 		opts.Cookie.Set(k, v)
 	}
 
-	provider := &wkhtmltopdf.Page{Input: page.URL, PageOptions: opts}
+	var reader io.Reader
+	if len(page.InlinedHTML) > 0 {
+		reader = bytes.NewReader(page.InlinedHTML)
+	} else if cacheReader := page.Cache().Reader(); cacheReader != nil {
+		// Inject a <base> tag so relative links still work with raw HTML input
+		baseTag := fmt.Sprintf(`<base href="%s">`, page.URL)
+		reader = io.MultiReader(bytes.NewBufferString(baseTag), cacheReader)
+	}
+
+	var provider wkhtmltopdf.PageProvider
+	if reader != nil {
+		pReader := wkhtmltopdf.NewPageReader(reader)
+		pReader.PageOptions = opts
+		provider = pReader
+	} else {
+		provider = &wkhtmltopdf.Page{Input: page.URL, PageOptions: opts}
+	}
 
 	gen.AddPage(provider)
 

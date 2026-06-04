@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -23,15 +24,19 @@ type MarkdownProcessor struct {
 }
 
 func (m *MarkdownProcessor) Process(ctx context.Context, page *entity.Page) ([]entity.File, error) {
-	reader := page.Cache().Reader()
-
-	if reader == nil {
-		response, err := m.get(ctx, page, page.URL)
-		if err != nil {
-			return nil, err
+	var reader io.Reader
+	if len(page.InlinedHTML) > 0 {
+		reader = bytes.NewReader(page.InlinedHTML)
+	} else {
+		reader = page.Cache().Reader()
+		if reader == nil {
+			response, err := m.get(ctx, page, page.URL)
+			if err != nil {
+				return nil, err
+			}
+			defer response.Body.Close()
+			reader = response.Body
 		}
-		defer response.Body.Close()
-		reader = response.Body
 	}
 
 	pageURL, err := url.Parse(page.URL)

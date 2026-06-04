@@ -21,6 +21,15 @@ function initApp() {
     });
 
     if (window.location.pathname.endsWith("/")) {
+        if (window.location.hash) {
+            const hash = window.location.hash.slice(1);
+            if (hash.startsWith('collection_')) {
+                currentTab = 'collection_view';
+                activeCollectionId = hash.replace('collection_', '');
+            } else if (['dashboard', 'collections', 'all_links'].includes(hash)) {
+                currentTab = hash;
+            }
+        }
         loadData();
     } else {
         loadPage(window.location.pathname.slice(1));
@@ -48,7 +57,9 @@ function setTab(tab) {
     $(`#nav_${tab}`).addClass('active');
     
     if (window.location.pathname !== "/") {
-        history.pushState(null, null, "/");
+        history.pushState(null, null, "/#" + tab);
+    } else {
+        window.location.hash = tab;
     }
     
     $('#search_input').parent().show();
@@ -65,7 +76,9 @@ function viewCollection(id) {
     $('.nav-item').removeClass('active');
     
     if (window.location.pathname !== "/") {
-        history.pushState(null, null, "/");
+        history.pushState(null, null, "/#collection_" + id);
+    } else {
+        window.location.hash = "collection_" + id;
     }
     
     $('#search_input').parent().show();
@@ -80,12 +93,15 @@ function filterByTag(tag) {
     $('.nav-item').removeClass('active');
     $(`#nav_all_links`).addClass('active');
 
-    history.pushState(null, null, "/");
+    if (window.location.pathname !== "/") {
+        history.pushState(null, null, "/#all_links");
+    } else {
+        window.location.hash = "all_links";
+    }
     renderArchives();
 }
 
 function goHome() {
-    history.pushState(null, null, "/");
     $('#search_input').val('');
     currentSearch = '';
     currentTag = '';
@@ -342,6 +358,19 @@ function hideNewArchiveModal() {
     $('#new_archive_modal').css('display', 'none');
 }
 
+function toggleSublinkMarkdownVisibility() {
+    const depthStr = $('#new_archive_depth').val();
+    const depth = parseInt(depthStr) || 0;
+    const includeMarkdown = $('#new_archive_markdown').is(':checked');
+    
+    if (depth > 0 && includeMarkdown) {
+        $('#new_archive_sublink_markdown_wrapper').css('display', 'flex');
+    } else {
+        $('#new_archive_sublink_markdown_wrapper').css('display', 'none');
+        $('#new_archive_sublink_markdown').prop('checked', false);
+    }
+}
+
 function submitNewArchive() {
     const url = $('#new_archive_url').val().trim();
     const tagsStr = $('#new_archive_tags').val().trim();
@@ -358,11 +387,20 @@ function submitNewArchive() {
     if ($('#new_archive_markdown').is(':checked')) {
         formats.push("markdown");
     }
+    
+    let sublinkFormats = [];
+    if ($('#new_archive_sublink_markdown_wrapper').is(':visible') && $('#new_archive_sublink_markdown').is(':checked')) {
+        sublinkFormats = ["single_file", "pdf", "markdown"];
+    } else {
+        // Default formats for sublinks if markdown is not captured
+        sublinkFormats = ["single_file", "pdf"];
+    }
 
     let payload = {
         url: url,
         tags: tags,
         formats: formats,
+        sublink_formats: sublinkFormats,
         depth: parseInt(depthStr) || 0
     };
     
@@ -480,7 +518,9 @@ function deleteArchive(id) {
         url: "/api/v1/pages/" + id,
         method: "DELETE",
         success: function () {
-            history.pushState(null, null, "/");
+            if (window.location.pathname !== "/") {
+                history.pushState(null, null, "/#" + currentTab);
+            }
             loadData();
         },
         error: function(err) {

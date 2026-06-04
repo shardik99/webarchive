@@ -127,7 +127,19 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 		collectionID = &col.ID
 	}
 
-	page := entity.NewPage(url, description, tags, headers, cookies, collectionID, depth, domainFormats...)
+	var sublinkFormats []entity.Format
+	if len(req.Value.SublinkFormats) > 0 {
+		sf, err := FormatFromRest(req.Value.SublinkFormats)
+		if err != nil {
+			return &openapi.AddPageBadRequest{
+				Field: "sublink_formats",
+				Error: err.Error(),
+			}, nil
+		}
+		sublinkFormats = sf
+	}
+
+	page := entity.NewPage(url, description, tags, headers, cookies, collectionID, depth, sublinkFormats, domainFormats...)
 	page.Owner = OwnerFromContext(ctx)
 	page.Status = entity.StatusNew
 	page.Prepare(ctx, s.processor)

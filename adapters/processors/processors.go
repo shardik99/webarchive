@@ -157,6 +157,10 @@ func (p *Processors) GetMeta(ctx context.Context, page *entity.Page) (entity.Met
 	tee := io.TeeReader(response.Body, page.Cache())
 
 	htmlNode, err := html.Parse(tee)
+	
+	// Ensure the entire body is read so it's fully cached
+	_, _ = io.Copy(io.Discard, tee)
+	
 	if err != nil {
 		return entity.Meta{}, fmt.Errorf("parse response body: %w", err)
 	}

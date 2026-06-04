@@ -107,7 +107,12 @@ func (w *Worker) do(ctx context.Context, wg *sync.WaitGroup, page *Page, log *za
 					continue
 				}
 
-				child := NewPage(l, page.Description, page.Tags, page.Headers, page.Cookies, page.CollectionID, page.Depth-1, page.Formats...)
+				childFormats := page.Formats
+				if len(page.SublinkFormats) > 0 {
+					childFormats = page.SublinkFormats
+				}
+
+				child := NewPage(l, page.Description, page.Tags, page.Headers, page.Cookies, page.CollectionID, page.Depth-1, page.SublinkFormats, childFormats...)
 				child.Owner = page.Owner
 				child.Status = StatusNew
 				child.Prepare(ctx, w.processor)
