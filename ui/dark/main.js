@@ -196,7 +196,17 @@ function renderArchives() {
         let statusElem = $(item_elem).find(".status-badge");
         statusElem.addClass(v.status.toLowerCase());
         statusElem.html(v.status);
-        statusElem.attr("title", v.status);
+        
+        if (v.status === 'WITH_ERRORS' && v.meta && v.meta.error) {
+            statusElem.css('cursor', 'pointer');
+            statusElem.attr("title", "Click to view error details");
+            statusElem.on('click', function(e) {
+                e.stopPropagation();
+                showErrorPopup(v.meta.error);
+            });
+        } else {
+            statusElem.attr("title", v.status);
+        }
         
         $(item_elem).find(".created-text").html(v.created ? new Date(v.created).toLocaleDateString() : 'Unknown date');
         $(item_elem).find(".title-text").html((v.meta && v.meta.title) || 'Untitled');
@@ -217,6 +227,11 @@ function renderArchives() {
 
         elem.append(item_elem);
     });
+}
+
+function showErrorPopup(errText) {
+    $('#error_modal_text').text(errText);
+    $('#error_modal').css('display', 'flex');
 }
 
 function goToPage(id) {
@@ -264,7 +279,12 @@ function loadPage(id) {
                     if (result.error && result.error !== "") {
                         badge.addClass("error");
                         link.html("⚠ Error Occurred");
-                        link.attr("title", result.error);
+                        link.attr("title", "Click to view error details");
+                        link.css("cursor", "pointer");
+                        link.on('click', function(e) {
+                            e.preventDefault();
+                            showErrorPopup(result.error);
+                        });
                     } else if (result.files && result.files.length > 0) {
                         result.files.forEach(function (file) {
                             link.attr("onclick", "window.open('/api/v1/pages/" + data.id + "/file/" + file.id + "', '_blank');");

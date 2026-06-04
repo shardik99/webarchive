@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 	"sync"
+	"time"
 
 	"go.uber.org/zap"
 	"golang.org/x/net/html"
@@ -61,7 +62,10 @@ func (w *Worker) Start(ctx context.Context, wg *sync.WaitGroup) {
 			log.Info("got new page")
 
 			wg.Add(1)
-			go w.do(ctx, wg, page, log)
+			w.do(ctx, wg, page, log)
+			
+			// Add a delay between processing pages to avoid rate limiting
+			time.Sleep(2 * time.Second)
 		}
 	}
 }

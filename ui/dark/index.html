@@ -141,6 +141,17 @@
     </div>
 </div>
 
+<!-- Error Modal -->
+<div id="error_modal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 1100; align-items: center; justify-content: center;">
+    <div class="glass" style="padding: 24px; width: 500px; display: flex; flex-direction: column; gap: 16px;">
+        <h3 style="color: #ef4444;">Error Details</h3>
+        <pre id="error_modal_text" style="background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; color: var(--text-secondary); font-size: 13px; max-height: 300px; overflow-y: auto; white-space: pre-wrap; font-family: monospace;"></pre>
+        <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
+            <button onclick="$('#error_modal').css('display', 'none');" style="background: var(--accent); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Close</button>
+        </div>
+    </div>
+</div>
+
 <!-- Templates -->
 <template id="collection_card_tmpl">
     <div class="archive-card glass item-container" style="border-top: 2px solid var(--accent);">
