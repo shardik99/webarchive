@@ -1,4 +1,6 @@
-# Own Webarchive
+# Own Webarchive (Fork)
+
+> **Note:** This project is a feature-rich fork of the original [`derfenix/webarchive`](https://github.com/derfenix/webarchive).
 
 Aimed to be a simple, fast and easy-to-use webarchive for personal or home-net usage.
 
@@ -60,7 +62,16 @@ in case of any conflicts.
 
 ## Usage
 
-### 1. Start the server
+### 1. Access the Dashboard (UI)
+
+The easiest way to archive and view pages is via the modern dark-themed web UI! 
+By default, the UI is enabled and accessible at: **`http://localhost:5001/`**
+
+*If authentication is enabled (`AUTH_ENABLED=true`), you will be prompted to log in.*
+
+---
+
+### 2. Start the server
 
 #### Start without docker
 ```shell
@@ -126,16 +137,19 @@ Where  `$page_id` — value of the `id` field from previous command response, an
 curl -X GET --location "http://localhost:5001/api/v1/pages" | jq .
 ```
 
-## Roadmap
+## Fork Features & Roadmap
 
-- [x] Save page to pdf 
-- [x] Save URL headers
-- [x] Save page to the single-page html
-- [x] Save page to html with separate resource files
-- [x] Save page to markdown
-- [x] Modern web UI dashboard
-- [x] Optional authentication & Multi-user access
-- [x] Tags/Categories
+This fork introduces several major capabilities over the original project. 
+
+### 🚀 Completed in this fork:
+- [x] **Modern Web UI**: A dark-themed dashboard with grid and list views.
+- [x] **Authentication & Multi-User Support**: Archive pages privately with ownership scoping.
+- [x] **Authenticated Archiving**: Ability to pass custom headers/cookies via the API to archive paywalled or login-required pages.
+- [x] **Advanced HTML Archiving**: Save raw HTML while traversing, downloading, and relinking all external resources into separate files.
+- [x] **Markdown Support**: Extract clean, readable Markdown from articles (similar to reading mode).
+- [x] **Tags & Categories**: Tag and organize your archives for easier retrieval.
+
+### 📅 Planned (Roadmap):
 - [ ] Support SQL database with or without separate files storage
 - [ ] Companion Chrome Extension for active session forwarding
 - [ ] Follow links and link depth for recursive archival
