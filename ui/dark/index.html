@@ -67,6 +67,10 @@
         <h3>New Archive</h3>
         <input type="text" id="new_archive_url" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="https://example.com">
         <input type="text" id="new_archive_tags" class="search-input" style="background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border);" placeholder="Tags (comma separated)">
+        <label style="display: flex; align-items: center; gap: 8px; color: var(--text-secondary); font-size: 14px; cursor: pointer;">
+            <input type="checkbox" id="new_archive_markdown" style="width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer;">
+            Include Markdown Format
+        </label>
         <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px;">
             <button onclick="hideNewArchiveModal()" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer;">Cancel</button>
             <button onclick="submitNewArchive()" style="background: var(--accent); border: none; color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-weight: 600;">Archive</button>

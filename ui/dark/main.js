@@ -239,6 +239,7 @@ function showNewArchiveModal() {
     $('#new_archive_modal').css('display', 'flex');
     $('#new_archive_url').val('');
     $('#new_archive_tags').val('');
+    $('#new_archive_markdown').prop('checked', false);
     $('#new_archive_url').focus();
 }
 
@@ -256,10 +257,15 @@ function submitNewArchive() {
         tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
     }
 
+    let formats = ["single_file", "pdf"];
+    if ($('#new_archive_markdown').is(':checked')) {
+        formats.push("markdown");
+    }
+
     let payload = {
         url: url,
         tags: tags,
-        formats: ["single_file", "pdf"]
+        formats: formats
     };
 
     $.ajax({
