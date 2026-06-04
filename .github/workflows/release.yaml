@@ -9,6 +9,9 @@ name: release
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Setup Go
