@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glassmorphism Webarchive Prototype</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --accent: #00f2fe;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Dynamic Animated Background Elements to blur */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.8;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+        
+        .blob-1 {
+            width: 500px;
+            height: 500px;
+            background: #4facfe;
+            top: -100px;
+            left: -100px;
+        }
+        
+        .blob-2 {
+            width: 600px;
+            height: 600px;
+            background: #f093fb;
+            bottom: -200px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+
+        .blob-3 {
+            width: 400px;
+            height: 400px;
+            background: #43e97b;
+            top: 40%;
+            left: 30%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 100px) scale(1.1); }
+            100% { transform: translate(-50px, -50px) scale(0.9); }
+        }
+
+        /* Base Glass Class */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            padding: 24px;
+            gap: 24px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-menu {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .nav-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: var(--accent);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            overflow: hidden;
+        }
+
+        /* Topbar / Search */
+        .topbar {
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 100px;
+        }
+
+        .search-container {
+            width: 400px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            padding: 8px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .search-container:focus-within {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent);
+        }
+
+        .search-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 16px;
+            width: 100%;
+            padding: 8px;
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .user-profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .dashboard-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            overflow-y: auto;
+            padding-right: 12px;
+            padding-bottom: 24px;
+        }
+
+        /* Hide scrollbar for a cleaner look */
+        .grid-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .grid-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
+        /* Archive Card */
+        .archive-card {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .archive-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .archive-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .archive-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-badge {
+            font-size: 12px;
+            padding: 4px 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .card-url {
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            margin-top: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 16px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Dynamic Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="app-container">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar glass">
+            <div class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                WebArchive
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item active">All Archives</li>
+                <li class="nav-item">Favorites</li>
+                <li class="nav-item">Unread</li>
+                <li class="nav-item" style="margin-top: 24px; opacity: 0.5;">TAGS</li>
+                <li class="nav-item"># Development</li>
+                <li class="nav-item"># Design</li>
+                <li class="nav-item"># Reading List</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- Topbar -->
+            <header class="topbar glass">
+                <div class="search-container">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" class="search-input" placeholder="Search archives, tags, or URLs...">
+                </div>
+                <div class="user-profile"></div>
+            </header>
+
+            <!-- Dashboard -->
+            <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+                <div class="dashboard-header">
+                    <h2>Recent Archives</h2>
+                </div>
+
+                <div class="grid-container">
+                    <!-- Cards -->
+                    <div class="archive-card glass">
+                        <div class="card-header">
+                            <span class="card-badge" style="color: #4facfe;">Development</span>
+                        </div>
+                        <h3 class="card-title">Understanding the CSS Backdrop-Filter Property</h3>
+                        <p class="card-url">developer.mozilla.org</p>
+                        <div class="card-footer">
+                            <span>Saved 2 hours ago</span>
+                            <span>2.4 MB</span>
+                        </div>
+                    </div>
+
+                    <div class="archive-card glass">
+                        <div class="card-header">
+                            <span class="card-badge" style="color: #f093fb;">Design</span>
+                        </div>
+                        <h3 class="card-title">The Future of UI: Glassmorphism vs Neumorphism</h3>
+                        <p class="card-url">uxdesign.cc</p>
+                        <div class="card-footer">
+                            <span>Saved 5 hours ago</span>
+                            <span>5.1 MB</span>
+                        </div>
+                    </div>
+
+                    <div class="archive-card glass">
+                        <div class="card-header">
+                            <span class="card-badge" style="color: #43e97b;">Reading</span>
+                        </div>
+                        <h3 class="card-title">Go 1.22 Release Notes and WebAssembly Support</h3>
+                        <p class="card-url">go.dev/blog</p>
+                        <div class="card-footer">
+                            <span>Saved Yesterday</span>
+                            <span>1.2 MB</span>
+                        </div>
+                    </div>
+                    
+                    <div class="archive-card glass">
+                        <div class="card-header">
+                            <span class="card-badge" style="color: #f5a623;">News</span>
+                        </div>
+                        <h3 class="card-title">Hacker News: Top stories of the week</h3>
+                        <p class="card-url">news.ycombinator.com</p>
+                        <div class="card-footer">
+                            <span>Saved Yesterday</span>
+                            <span>0.8 MB</span>
+                        </div>
+                    </div>
+
+                    <div class="archive-card glass">
+                        <div class="card-header">
+                            <span class="card-badge" style="color: #4facfe;">Development</span>
+                        </div>
+                        <h3 class="card-title">Building Resilient Distributed Systems</h3>
+                        <p class="card-url">martinfowler.com</p>
+                        <div class="card-footer">
+                            <span>Saved 2 days ago</span>
+                            <span>3.5 MB</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+</body>
+</html>

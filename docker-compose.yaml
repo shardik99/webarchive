@@ -2,7 +2,7 @@ version: "3"
 
 services:
   webarchive:
-    image: ghcr.io/derfenix/webarchive:latest
+    image: ghcr.io/shardik99/webarchive:latest
 #    build:
 #      dockerfile: ./Dockerfile
 #      context: .
