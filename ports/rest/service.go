@@ -119,6 +119,14 @@ func (s *Service) AddPage(ctx context.Context, req openapi.OptAddPageReq, params
 		depth = req.Value.Depth.Value
 	}
 
+	if depth > 0 && collectionID == nil {
+		col := entity.NewCollection(url, "Auto-created collection for links from "+url, OwnerFromContext(ctx))
+		if err := s.collections.Save(ctx, col); err != nil {
+			return nil, fmt.Errorf("create auto collection: %w", err)
+		}
+		collectionID = &col.ID
+	}
+
 	page := entity.NewPage(url, description, tags, headers, cookies, collectionID, depth, domainFormats...)
 	page.Owner = OwnerFromContext(ctx)
 	page.Status = entity.StatusNew
