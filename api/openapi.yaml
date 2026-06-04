@@ -231,6 +231,10 @@ paths:
                   type: string
                 description:
                   type: string
+                collection_id:
+                  type: string
+                  format: uuid
+                  nullable: true
                 tags:
                   type: array
                   items:

@@ -1275,9 +1275,10 @@ type UpdatePageNotFound struct{}
 func (*UpdatePageNotFound) updatePageRes() {}
 
 type UpdatePageReq struct {
-	Title       OptString `json:"title"`
-	Description OptString `json:"description"`
-	Tags        []string  `json:"tags"`
+	Title        OptString  `json:"title"`
+	Description  OptString  `json:"description"`
+	CollectionID OptNilUUID `json:"collection_id"`
+	Tags         []string   `json:"tags"`
 }
 
 // GetTitle returns the value of Title.
@@ -1288,6 +1289,11 @@ func (s *UpdatePageReq) GetTitle() OptString {
 // GetDescription returns the value of Description.
 func (s *UpdatePageReq) GetDescription() OptString {
 	return s.Description
+}
+
+// GetCollectionID returns the value of CollectionID.
+func (s *UpdatePageReq) GetCollectionID() OptNilUUID {
+	return s.CollectionID
 }
 
 // GetTags returns the value of Tags.
@@ -1303,6 +1309,11 @@ func (s *UpdatePageReq) SetTitle(val OptString) {
 // SetDescription sets the value of Description.
 func (s *UpdatePageReq) SetDescription(val OptString) {
 	s.Description = val
+}
+
+// SetCollectionID sets the value of CollectionID.
+func (s *UpdatePageReq) SetCollectionID(val OptNilUUID) {
+	s.CollectionID = val
 }
 
 // SetTags sets the value of Tags.

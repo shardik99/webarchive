@@ -230,15 +230,36 @@ function renderArchives() {
         
         if (viewMode === 'grid') {
             $(item_elem).find(".desc-text").html((v.meta && v.meta.description) || '');
-            
-            let tagsContainer = $(item_elem).find(".tags-container");
+        }
+        
+        let collectionSelect = $(item_elem).find(".card-collection-select");
+        if (collectionSelect.length > 0) {
+            collectionSelect.attr('data-id', v.id);
+            let optionsHtml = '<option value="" style="background: var(--bg-dark);">No Collection</option>';
+            globalCollections.forEach(c => {
+                let selected = (v.collection_id === c.id) ? 'selected' : '';
+                optionsHtml += `<option value="${c.id}" style="background: var(--bg-dark);" ${selected}>${c.name}</option>`;
+            });
+            collectionSelect.html(optionsHtml);
+        }
+
+        let tagsContainer = $(item_elem).find(".tags-container");
+        if (tagsContainer.length > 0) {
+            let tHtml = '';
             if (v.tags && v.tags.length > 0) {
-                let tHtml = '';
                 v.tags.forEach(t => {
-                    tHtml += `<span style="background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 11px;">${t}</span>`;
+                    tHtml += `<span class="breadcrumb-tag" style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 11px; display: inline-flex; align-items: center; gap: 4px;">
+                        ${t}
+                        <span onclick="removeTag(event, '${v.id}', '${t.replace(/'/g, "\\'")}')" style="cursor: pointer; opacity: 0.7;">&times;</span>
+                    </span>`;
                 });
-                tagsContainer.html(tHtml);
             }
+            tagsContainer.html(tHtml);
+        }
+        let tagInput = $(item_elem).find(".tag-input");
+        if (tagInput.length > 0) {
+            tagInput.attr('data-id', v.id);
+            tagInput.attr('data-tags', JSON.stringify(v.tags || []));
         }
 
         elem.append(item_elem);
@@ -248,6 +269,92 @@ function renderArchives() {
 function showErrorPopup(errText) {
     $('#error_modal_text').text(errText);
     $('#error_modal').css('display', 'flex');
+}
+
+function updateItemCollection(event, selectElem) {
+    event.stopPropagation();
+    let id = $(selectElem).attr('data-id');
+    let newCollectionId = $(selectElem).val();
+    
+    let payload = {
+        collection_id: newCollectionId || null
+    };
+
+    $.ajax({
+        url: "/api/v1/pages/" + id,
+        method: "PATCH",
+        data: JSON.stringify(payload),
+        contentType: "application/json",
+        success: function () {
+            let item = globalData.find(p => p.id === id);
+            if (item) item.collection_id = newCollectionId || undefined;
+        },
+        error: function(err) {
+            console.error("Failed to update collection", err);
+            alert("Failed to update collection.");
+        }
+    });
+}
+
+function handleTagInput(event, inputElem) {
+    if (event.key === ',' || event.keyCode === 188 || event.key === 'Enter') {
+        event.stopPropagation();
+        let val = $(inputElem).val().replace(/,/g, '').trim();
+        if (!val) {
+            $(inputElem).val('');
+            return;
+        }
+        
+        let id = $(inputElem).attr('data-id');
+        let item = globalData.find(p => p.id === id);
+        if (!item) return;
+        
+        let tags = item.tags || [];
+        if (!tags.includes(val)) {
+            tags.push(val);
+        }
+        
+        let payload = { tags: tags };
+        $.ajax({
+            url: "/api/v1/pages/" + id,
+            method: "PATCH",
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+            success: function () {
+                item.tags = tags;
+                $(inputElem).val('');
+                renderArchives(); 
+            },
+            error: function(err) {
+                console.error("Failed to add tag", err);
+                alert("Failed to add tag.");
+            }
+        });
+    }
+}
+
+function removeTag(event, id, tagToRemove) {
+    event.stopPropagation();
+    let item = globalData.find(p => p.id === id);
+    if (!item) return;
+    
+    let tags = (item.tags || []).filter(t => t !== tagToRemove);
+    
+    let payload = { tags: tags };
+    $.ajax({
+        url: "/api/v1/pages/" + id,
+        method: "PATCH",
+        data: JSON.stringify(payload),
+        contentType: "application/json",
+        success: function () {
+            item.tags = tags;
+            renderArchives();
+        },
+        error: function(err) {
+            console.error("Failed to remove tag", err);
+            alert("Failed to remove tag.");
+        }
+    });
 }
 
 function goToPage(id) {

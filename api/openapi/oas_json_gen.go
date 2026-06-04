@@ -2409,6 +2409,12 @@ func (s *UpdatePageReq) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.CollectionID.Set {
+			e.FieldStart("collection_id")
+			s.CollectionID.Encode(e)
+		}
+	}
+	{
 		if s.Tags != nil {
 			e.FieldStart("tags")
 			e.ArrStart()
@@ -2420,10 +2426,11 @@ func (s *UpdatePageReq) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfUpdatePageReq = [3]string{
+var jsonFieldsNameOfUpdatePageReq = [4]string{
 	0: "title",
 	1: "description",
-	2: "tags",
+	2: "collection_id",
+	3: "tags",
 }
 
 // Decode decodes UpdatePageReq from json.
@@ -2453,6 +2460,16 @@ func (s *UpdatePageReq) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "collection_id":
+			if err := func() error {
+				s.CollectionID.Reset()
+				if err := s.CollectionID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"collection_id\"")
 			}
 		case "tags":
 			if err := func() error {

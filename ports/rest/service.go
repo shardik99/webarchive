@@ -223,6 +223,14 @@ func (s *Service) UpdatePage(ctx context.Context, req openapi.OptUpdatePageReq, 
 	if req.Value.Tags != nil {
 		page.Tags = req.Value.Tags
 	}
+	if req.Value.CollectionID.IsSet() {
+		if req.Value.CollectionID.Null {
+			page.CollectionID = nil
+		} else {
+			uid := req.Value.CollectionID.Value
+			page.CollectionID = &uid
+		}
+	}
 
 	if err := s.pages.Update(ctx, page); err != nil {
 		return nil, fmt.Errorf("update page: %w", err)

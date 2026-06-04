@@ -174,27 +174,42 @@
     <div class="archive-card glass item-container">
         <div class="card-header">
             <span class="status-badge"></span>
+            <select class="card-collection-select" onclick="event.stopPropagation();" onchange="updateItemCollection(event, this)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 4px; font-size: 11px; padding: 2px 4px; max-width: 120px;">
+                <option value="" style="background: var(--bg-dark);">No Collection</option>
+            </select>
         </div>
         <h3 class="card-title title-text"></h3>
         <p class="card-url url-text"></p>
         <p class="card-desc desc-text"></p>
-        <div class="card-tags tags-container" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px;"></div>
-        <div class="card-footer">
+        <div class="card-tags-container" style="margin-top: 8px;" onclick="event.stopPropagation();">
+            <div class="tags-container" style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 4px;"></div>
+            <input type="text" class="tag-input" placeholder="Add tag..." onkeyup="handleTagInput(event, this)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 4px; font-size: 11px; padding: 4px; width: 100%; box-sizing: border-box;">
+        </div>
+        <div class="card-footer" style="margin-top: 8px;">
             <span class="created-text"></span>
         </div>
     </div>
 </template>
 
 <template id="list_row_tmpl">
-    <div class="list-row glass item-container">
-        <div class="list-col-main">
+    <div class="list-row glass item-container" style="align-items: center;">
+        <div class="list-col-main" style="flex: 2;">
             <h3 class="title-text"></h3>
             <p class="url-text"></p>
+            <div class="card-tags-container" style="margin-top: 4px; display: flex; align-items: center; gap: 8px;" onclick="event.stopPropagation();">
+                <div class="tags-container" style="display: flex; gap: 4px; flex-wrap: wrap;"></div>
+                <input type="text" class="tag-input" placeholder="Add tag..." onkeyup="handleTagInput(event, this)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 4px; font-size: 11px; padding: 2px 4px; width: 100px;">
+            </div>
         </div>
-        <div class="list-col-status">
+        <div class="list-col-collection" style="flex: 1; padding: 0 16px;" onclick="event.stopPropagation();">
+            <select class="card-collection-select" onclick="event.stopPropagation();" onchange="updateItemCollection(event, this)" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--text-primary); border-radius: 4px; font-size: 12px; padding: 4px; width: 100%;">
+                <option value="" style="background: var(--bg-dark);">No Collection</option>
+            </select>
+        </div>
+        <div class="list-col-status" style="flex: 1;">
             <span class="status-badge"></span>
         </div>
-        <div class="list-col-date">
+        <div class="list-col-date" style="flex: 1;">
             <span class="created-text"></span>
         </div>
     </div>
