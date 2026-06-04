@@ -38,6 +38,7 @@ func (p *PDF) Process(_ context.Context, page *entity.Page) ([]entity.File, erro
 	gen.Title.Set(page.URL)
 
 	opts := wkhtmltopdf.NewPageOptions()
+	opts.Encoding.Set("utf-8")
 	opts.PrintMediaType.Set(p.cfg.MediaPrint)
 	opts.JavascriptDelay.Set(200)
 	opts.DisableJavascript.Set(false)
