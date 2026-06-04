@@ -91,6 +91,31 @@ func (p *Page) Save(_ context.Context, page *entity.Page) error {
 	return nil
 }
 
+func (p *Page) Update(ctx context.Context, page *entity.Page) error {
+	return p.Save(ctx, page)
+}
+
+func (p *Page) Delete(_ context.Context, id uuid.UUID) error {
+	if p.db.IsClosed() {
+		return repository.ErrDBClosed
+	}
+
+	page := entity.Page{}
+	page.ID = id
+	key := p.key(&page)
+
+	if err := p.db.Update(func(txn *badger.Txn) error {
+		if err := txn.Delete(key); err != nil {
+			return fmt.Errorf("delete data: %w", err)
+		}
+		return nil
+	}); err != nil {
+		return fmt.Errorf("update db: %w", err)
+	}
+
+	return nil
+}
+
 func (p *Page) Get(_ context.Context, id uuid.UUID) (*entity.Page, error) {
 	page := entity.Page{}
 	page.ID = id

@@ -152,9 +152,6 @@ func FormatFromRest(format []openapi.Format) ([]entity.Format, error) {
 			case openapi.FormatSingleFile:
 				formats[i] = entity.FormatSingleFile
 
-			case openapi.FormatHTML:
-				formats[i] = entity.FormatHTML
-
 			case openapi.FormatMarkdown:
 				formats[i] = entity.FormatMarkdown
 
@@ -175,8 +172,6 @@ func FormatToRest(format entity.Format) openapi.Format {
 		return openapi.FormatSingleFile
 	case entity.FormatHeaders:
 		return openapi.FormatHeaders
-	case entity.FormatHTML:
-		return openapi.FormatHTML
 	case entity.FormatMarkdown:
 		return openapi.FormatMarkdown
 	default:

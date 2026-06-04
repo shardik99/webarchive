@@ -5,10 +5,18 @@ type AddPageRes interface {
 	addPageRes()
 }
 
+type DeletePageRes interface {
+	deletePageRes()
+}
+
 type GetFileRes interface {
 	getFileRes()
 }
 
 type GetPageRes interface {
 	getPageRes()
+}
+
+type UpdatePageRes interface {
+	updatePageRes()
 }

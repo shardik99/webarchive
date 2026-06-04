@@ -22,7 +22,6 @@ const (
 	FormatHeaders Format = iota
 	FormatSingleFile
 	FormatPDF
-	FormatHTML
 	FormatMarkdown
 )
 
@@ -30,7 +29,6 @@ var AllFormats = []Format{
 	FormatHeaders,
 	FormatPDF,
 	FormatSingleFile,
-	FormatHTML,
 	FormatMarkdown,
 }
 

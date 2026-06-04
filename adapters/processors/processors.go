@@ -84,7 +84,6 @@ func NewProcessors(cfg config.Config, log *zap.Logger) (*Processors, error) {
 			entity.FormatHeaders:    NewHeaders(httpClient),
 			entity.FormatPDF:        NewPDF(cfg.PDF),
 			entity.FormatSingleFile: NewSingleFile(httpClient, log),
-			entity.FormatHTML:       NewHTML(httpClient, log),
 			entity.FormatMarkdown:   NewMarkdown(httpClient, log),
 		},
 	}
@@ -163,14 +162,20 @@ func (p *Processors) GetMeta(ctx context.Context, page *entity.Page) (entity.Met
 	}
 
 	var fc *html.Node
-	for fc = htmlNode.FirstChild; fc != nil && fc.Data != "html"; fc = fc.NextSibling {
+	for fc = htmlNode.FirstChild; fc != nil; fc = fc.NextSibling {
+		if fc.Type == html.ElementNode && fc.Data == "html" {
+			break
+		}
 	}
 
 	if fc == nil {
 		return entity.Meta{}, fmt.Errorf("failed to find html tag")
 	}
 
-	for fc = fc.FirstChild; fc != nil && fc.Data != "head"; fc = fc.NextSibling {
+	for fc = fc.FirstChild; fc != nil; fc = fc.NextSibling {
+		if fc.Type == html.ElementNode && fc.Data == "head" {
+			break
+		}
 	}
 
 	if fc == nil {

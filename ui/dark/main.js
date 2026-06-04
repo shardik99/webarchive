@@ -181,6 +181,10 @@ function loadPage(id) {
             $(page_elem).find("#page_description").html(data.meta.description || '');
             $(page_elem).find("#page_url").html(data.url);
 
+            // Hook up Edit and Delete buttons
+            $(page_elem).find("#btn_edit_page").on('click', () => showEditArchiveModal(data));
+            $(page_elem).find("#btn_delete_page").on('click', () => deleteArchive(data.id));
+
             const resultsContainer = $(page_elem).find("#results");
             const result_tmpl = document.getElementById("result_tmpl");
 
@@ -254,22 +258,88 @@ function submitNewArchive() {
 
     let payload = {
         url: url,
-        tags: tags
+        tags: tags,
+        formats: ["single_file", "pdf"]
     };
 
     $.ajax({
         url: "/api/v1/pages",
-        type: "POST",
-        contentType: "application/json",
+        method: "POST",
         data: JSON.stringify(payload),
-        success: function() {
+        contentType: "application/json",
+        success: function () {
             hideNewArchiveModal();
-            loadIndex(); // Refresh the list
+            loadIndex();
         },
         error: function(err) {
-            console.error("Failed to add archive:", err);
-            alert("Failed to add archive. Check console.");
+            console.error("Failed to add archive", err);
+            alert("Failed to add archive.");
         }
     });
 }
 
+// Edit Archive Logic
+function showEditArchiveModal(data) {
+    $('#edit_archive_id').val(data.id);
+    $('#edit_archive_title').val(data.meta.title || '');
+    $('#edit_archive_desc').val(data.meta.description || '');
+    $('#edit_archive_tags').val((data.tags || []).join(', '));
+    $('#edit_archive_modal').css('display', 'flex');
+}
+
+function hideEditArchiveModal() {
+    $('#edit_archive_modal').css('display', 'none');
+}
+
+function submitEditArchive() {
+    const id = $('#edit_archive_id').val();
+    const title = $('#edit_archive_title').val().trim();
+    const desc = $('#edit_archive_desc').val().trim();
+    const tagsStr = $('#edit_archive_tags').val().trim();
+
+    let tags = [];
+    if (tagsStr) {
+        tags = tagsStr.split(',').map(t => t.trim()).filter(t => t);
+    }
+
+    let payload = {
+        title: title,
+        description: desc,
+        tags: tags
+    };
+
+    $.ajax({
+        url: "/api/v1/pages/" + id,
+        method: "PATCH",
+        data: JSON.stringify(payload),
+        contentType: "application/json",
+        success: function () {
+            hideEditArchiveModal();
+            loadPage(id);
+        },
+        error: function(err) {
+            console.error("Failed to edit archive", err);
+            alert("Failed to edit archive.");
+        }
+    });
+}
+
+// Delete Archive Logic
+function deleteArchive(id) {
+    if (!confirm("Are you sure you want to permanently delete this archive and all its files?")) {
+        return;
+    }
+
+    $.ajax({
+        url: "/api/v1/pages/" + id,
+        method: "DELETE",
+        success: function () {
+            history.pushState(null, null, "/");
+            loadIndex();
+        },
+        error: function(err) {
+            console.error("Failed to delete archive", err);
+            alert("Failed to delete archive.");
+        }
+    });
+}

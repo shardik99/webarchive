@@ -18,6 +18,8 @@ type Pages interface {
 	Save(ctx context.Context, site *entity.Page) error
 	Get(ctx context.Context, id uuid.UUID) (*entity.Page, error)
 	GetFile(ctx context.Context, pageID, fileID uuid.UUID) (*entity.File, error)
+	Delete(ctx context.Context, id uuid.UUID) error
+	Update(ctx context.Context, page *entity.Page) error
 }
 
 func NewService(pages Pages, ch chan *entity.Page, processor entity.Processor) *Service {
@@ -151,6 +153,43 @@ func (s *Service) GetFile(ctx context.Context, params openapi.GetFileParams) (op
 	default:
 		return nil, fmt.Errorf("unsupported mimetype: %s", file.MimeType)
 	}
+}
+
+func (s *Service) DeletePage(ctx context.Context, params openapi.DeletePageParams) (openapi.DeletePageRes, error) {
+	page, err := s.pages.Get(ctx, params.ID)
+	if err != nil || page.Owner != OwnerFromContext(ctx) {
+		return &openapi.DeletePageNotFound{}, nil
+	}
+
+	if err := s.pages.Delete(ctx, params.ID); err != nil {
+		return nil, fmt.Errorf("delete page: %w", err)
+	}
+
+	return &openapi.DeletePageNoContent{}, nil
+}
+
+func (s *Service) UpdatePage(ctx context.Context, req openapi.OptUpdatePageReq, params openapi.UpdatePageParams) (openapi.UpdatePageRes, error) {
+	page, err := s.pages.Get(ctx, params.ID)
+	if err != nil || page.Owner != OwnerFromContext(ctx) {
+		return &openapi.UpdatePageNotFound{}, nil
+	}
+
+	if req.Value.Title.IsSet() {
+		page.Meta.Title = req.Value.Title.Value
+	}
+	if req.Value.Description.IsSet() {
+		page.Meta.Description = req.Value.Description.Value
+	}
+	if req.Value.Tags != nil {
+		page.Tags = req.Value.Tags
+	}
+
+	if err := s.pages.Update(ctx, page); err != nil {
+		return nil, fmt.Errorf("update page: %w", err)
+	}
+
+	restPage := PageToRest(page)
+	return &restPage, nil
 }
 
 func (s *Service) NewError(_ context.Context, err error) *openapi.ErrorStatusCode {

@@ -47,6 +47,25 @@ func encodeAddPageResponse(response AddPageRes, w http.ResponseWriter, span trac
 	}
 }
 
+func encodeDeletePageResponse(response DeletePageRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *DeletePageNoContent:
+		w.WriteHeader(204)
+		span.SetStatus(codes.Ok, http.StatusText(204))
+
+		return nil
+
+	case *DeletePageNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeGetFileResponse(response GetFileRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *GetFileOKApplicationPdf:
@@ -134,6 +153,32 @@ func encodeGetPagesResponse(response Pages, w http.ResponseWriter, span trace.Sp
 	}
 
 	return nil
+}
+
+func encodeUpdatePageResponse(response UpdatePageRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *Page:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *UpdatePageNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
 }
 
 func encodeErrorResponse(response *ErrorStatusCode, w http.ResponseWriter, span trace.Span) error {

@@ -29,6 +29,12 @@ type Invoker interface {
 	//
 	// POST /pages
 	AddPage(ctx context.Context, request OptAddPageReq, params AddPageParams) (AddPageRes, error)
+	// DeletePage invokes deletePage operation.
+	//
+	// Delete a page and its files.
+	//
+	// DELETE /pages/{id}
+	DeletePage(ctx context.Context, params DeletePageParams) (DeletePageRes, error)
 	// GetFile invokes getFile operation.
 	//
 	// Get file content.
@@ -47,6 +53,12 @@ type Invoker interface {
 	//
 	// GET /pages
 	GetPages(ctx context.Context, params GetPagesParams) (Pages, error)
+	// UpdatePage invokes updatePage operation.
+	//
+	// Edit page details (title, description, tags).
+	//
+	// PATCH /pages/{id}
+	UpdatePage(ctx context.Context, request OptUpdatePageReq, params UpdatePageParams) (UpdatePageRes, error)
 }
 
 // Client implements OAS client.
@@ -269,6 +281,96 @@ func (c *Client) sendAddPage(ctx context.Context, request OptAddPageReq, params 
 
 	stage = "DecodeResponse"
 	result, err := decodeAddPageResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// DeletePage invokes deletePage operation.
+//
+// Delete a page and its files.
+//
+// DELETE /pages/{id}
+func (c *Client) DeletePage(ctx context.Context, params DeletePageParams) (DeletePageRes, error) {
+	res, err := c.sendDeletePage(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendDeletePage(ctx context.Context, params DeletePageParams) (res DeletePageRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("deletePage"),
+		semconv.HTTPMethodKey.String("DELETE"),
+		semconv.HTTPRouteKey.String("/pages/{id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "DeletePage",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/pages/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "DELETE", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeDeletePageResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -567,6 +669,99 @@ func (c *Client) sendGetPages(ctx context.Context, params GetPagesParams) (res P
 
 	stage = "DecodeResponse"
 	result, err := decodeGetPagesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// UpdatePage invokes updatePage operation.
+//
+// Edit page details (title, description, tags).
+//
+// PATCH /pages/{id}
+func (c *Client) UpdatePage(ctx context.Context, request OptUpdatePageReq, params UpdatePageParams) (UpdatePageRes, error) {
+	res, err := c.sendUpdatePage(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendUpdatePage(ctx context.Context, request OptUpdatePageReq, params UpdatePageParams) (res UpdatePageRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("updatePage"),
+		semconv.HTTPMethodKey.String("PATCH"),
+		semconv.HTTPRouteKey.String("/pages/{id}"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "UpdatePage",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [2]string
+	pathParts[0] = "/pages/"
+	{
+		// Encode "id" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "id",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.UUIDToString(params.ID))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "PATCH", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeUpdatePageRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeUpdatePageResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

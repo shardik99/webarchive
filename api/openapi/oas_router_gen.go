@@ -87,12 +87,20 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				if len(elem) == 0 {
 					switch r.Method {
+					case "DELETE":
+						s.handleDeletePageRequest([1]string{
+							args[0],
+						}, elemIsEscaped, w, r)
 					case "GET":
 						s.handleGetPageRequest([1]string{
 							args[0],
 						}, elemIsEscaped, w, r)
+					case "PATCH":
+						s.handleUpdatePageRequest([1]string{
+							args[0],
+						}, elemIsEscaped, w, r)
 					default:
-						s.notAllowed(w, r, "GET")
+						s.notAllowed(w, r, "DELETE,GET,PATCH")
 					}
 
 					return
@@ -254,10 +262,26 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 				if len(elem) == 0 {
 					switch method {
+					case "DELETE":
+						r.name = "DeletePage"
+						r.summary = ""
+						r.operationID = "deletePage"
+						r.pathPattern = "/pages/{id}"
+						r.args = args
+						r.count = 1
+						return r, true
 					case "GET":
 						r.name = "GetPage"
 						r.summary = ""
 						r.operationID = "getPage"
+						r.pathPattern = "/pages/{id}"
+						r.args = args
+						r.count = 1
+						return r, true
+					case "PATCH":
+						r.name = "UpdatePage"
+						r.summary = ""
+						r.operationID = "updatePage"
 						r.pathPattern = "/pages/{id}"
 						r.args = args
 						r.count = 1

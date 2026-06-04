@@ -133,6 +133,44 @@ paths:
           description: Page not found
         default:
           $ref: '#/components/responses/undefinedError'
+    patch:
+      operationId: updatePage
+      description: Edit page details (title, description, tags)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                tags:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Page updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/page'
+        404:
+          description: Page not found
+        default:
+          $ref: '#/components/responses/undefinedError'
+    delete:
+      operationId: deletePage
+      description: Delete a page and its files
+      responses:
+        204:
+          description: Page deleted
+        404:
+          description: Page not found
+        default:
+          $ref: '#/components/responses/undefinedError'
 
   /pages/{id}/file/{file_id}:
     parameters:
@@ -181,7 +219,6 @@ components:
       enum:
         - all
         - pdf
-        - html
         - single_file
         - headers
         - markdown

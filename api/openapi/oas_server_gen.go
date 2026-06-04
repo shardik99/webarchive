@@ -14,6 +14,12 @@ type Handler interface {
 	//
 	// POST /pages
 	AddPage(ctx context.Context, req OptAddPageReq, params AddPageParams) (AddPageRes, error)
+	// DeletePage implements deletePage operation.
+	//
+	// Delete a page and its files.
+	//
+	// DELETE /pages/{id}
+	DeletePage(ctx context.Context, params DeletePageParams) (DeletePageRes, error)
 	// GetFile implements getFile operation.
 	//
 	// Get file content.
@@ -32,6 +38,12 @@ type Handler interface {
 	//
 	// GET /pages
 	GetPages(ctx context.Context, params GetPagesParams) (Pages, error)
+	// UpdatePage implements updatePage operation.
+	//
+	// Edit page details (title, description, tags).
+	//
+	// PATCH /pages/{id}
+	UpdatePage(ctx context.Context, req OptUpdatePageReq, params UpdatePageParams) (UpdatePageRes, error)
 	// NewError creates *ErrorStatusCode from error returned by handler.
 	//
 	// Used for common default response.

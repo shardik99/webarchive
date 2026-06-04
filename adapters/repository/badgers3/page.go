@@ -45,6 +45,16 @@ func (p *Page) GetFile(ctx context.Context, pageID, fileID uuid.UUID) (*entity.F
 	panic("implement me")
 }
 
+func (p *Page) Delete(ctx context.Context, id uuid.UUID) error {
+	// TODO implement me
+	panic("implement me")
+}
+
+func (p *Page) Update(ctx context.Context, page *entity.Page) error {
+	// TODO implement me
+	panic("implement me")
+}
+
 func (p *Page) Save(ctx context.Context, page *entity.Page) error {
 	if p.db.IsClosed() {
 		return repository.ErrDBClosed

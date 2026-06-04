@@ -133,6 +133,16 @@ func (s *AddPageReqHeaders) init() AddPageReqHeaders {
 	return m
 }
 
+// DeletePageNoContent is response for DeletePage operation.
+type DeletePageNoContent struct{}
+
+func (*DeletePageNoContent) deletePageRes() {}
+
+// DeletePageNotFound is response for DeletePage operation.
+type DeletePageNotFound struct{}
+
+func (*DeletePageNotFound) deletePageRes() {}
+
 // Ref: #/components/schemas/error
 type Error struct {
 	Message   string    `json:"message"`
@@ -191,7 +201,6 @@ type Format string
 const (
 	FormatAll        Format = "all"
 	FormatPdf        Format = "pdf"
-	FormatHTML       Format = "html"
 	FormatSingleFile Format = "single_file"
 	FormatHeaders    Format = "headers"
 	FormatMarkdown   Format = "markdown"
@@ -202,7 +211,6 @@ func (Format) AllValues() []Format {
 	return []Format{
 		FormatAll,
 		FormatPdf,
-		FormatHTML,
 		FormatSingleFile,
 		FormatHeaders,
 		FormatMarkdown,
@@ -215,8 +223,6 @@ func (s Format) MarshalText() ([]byte, error) {
 	case FormatAll:
 		return []byte(s), nil
 	case FormatPdf:
-		return []byte(s), nil
-	case FormatHTML:
 		return []byte(s), nil
 	case FormatSingleFile:
 		return []byte(s), nil
@@ -237,9 +243,6 @@ func (s *Format) UnmarshalText(data []byte) error {
 		return nil
 	case FormatPdf:
 		*s = FormatPdf
-		return nil
-	case FormatHTML:
-		*s = FormatHTML
 		return nil
 	case FormatSingleFile:
 		*s = FormatSingleFile
@@ -497,6 +500,52 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
+// NewOptUpdatePageReq returns new OptUpdatePageReq with value set to v.
+func NewOptUpdatePageReq(v UpdatePageReq) OptUpdatePageReq {
+	return OptUpdatePageReq{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptUpdatePageReq is optional UpdatePageReq.
+type OptUpdatePageReq struct {
+	Value UpdatePageReq
+	Set   bool
+}
+
+// IsSet returns true if OptUpdatePageReq was set.
+func (o OptUpdatePageReq) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptUpdatePageReq) Reset() {
+	var v UpdatePageReq
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptUpdatePageReq) SetTo(v UpdatePageReq) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptUpdatePageReq) Get() (v UpdatePageReq, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptUpdatePageReq) Or(d UpdatePageReq) UpdatePageReq {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // Ref: #/components/schemas/page
 type Page struct {
 	ID      uuid.UUID `json:"id"`
@@ -578,7 +627,8 @@ func (s *Page) SetMeta(val PageMeta) {
 	s.Meta = val
 }
 
-func (*Page) addPageRes() {}
+func (*Page) addPageRes()    {}
+func (*Page) updatePageRes() {}
 
 type PageMeta struct {
 	Title       string    `json:"title"`
@@ -894,4 +944,45 @@ func (s *Status) UnmarshalText(data []byte) error {
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
+}
+
+// UpdatePageNotFound is response for UpdatePage operation.
+type UpdatePageNotFound struct{}
+
+func (*UpdatePageNotFound) updatePageRes() {}
+
+type UpdatePageReq struct {
+	Title       OptString `json:"title"`
+	Description OptString `json:"description"`
+	Tags        []string  `json:"tags"`
+}
+
+// GetTitle returns the value of Title.
+func (s *UpdatePageReq) GetTitle() OptString {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *UpdatePageReq) GetDescription() OptString {
+	return s.Description
+}
+
+// GetTags returns the value of Tags.
+func (s *UpdatePageReq) GetTags() []string {
+	return s.Tags
+}
+
+// SetTitle sets the value of Title.
+func (s *UpdatePageReq) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *UpdatePageReq) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetTags sets the value of Tags.
+func (s *UpdatePageReq) SetTags(val []string) {
+	s.Tags = val
 }

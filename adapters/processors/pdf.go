@@ -62,12 +62,7 @@ func (p *PDF) Process(_ context.Context, page *entity.Page) ([]entity.File, erro
 		opts.Cookie.Set(k, v)
 	}
 
-	var provider wkhtmltopdf.PageProvider
-	if len(page.Cache().Get()) > 0 {
-		provider = &wkhtmltopdf.PageReader{Input: page.Cache().Reader(), PageOptions: opts}
-	} else {
-		provider = &wkhtmltopdf.Page{Input: page.URL, PageOptions: opts}
-	}
+	provider := &wkhtmltopdf.Page{Input: page.URL, PageOptions: opts}
 
 	gen.AddPage(provider)
 

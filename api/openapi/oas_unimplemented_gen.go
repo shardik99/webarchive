@@ -22,6 +22,15 @@ func (UnimplementedHandler) AddPage(ctx context.Context, req OptAddPageReq, para
 	return r, ht.ErrNotImplemented
 }
 
+// DeletePage implements deletePage operation.
+//
+// Delete a page and its files.
+//
+// DELETE /pages/{id}
+func (UnimplementedHandler) DeletePage(ctx context.Context, params DeletePageParams) (r DeletePageRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // GetFile implements getFile operation.
 //
 // Get file content.
@@ -46,6 +55,15 @@ func (UnimplementedHandler) GetPage(ctx context.Context, params GetPageParams) (
 //
 // GET /pages
 func (UnimplementedHandler) GetPages(ctx context.Context, params GetPagesParams) (r Pages, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// UpdatePage implements updatePage operation.
+//
+// Edit page details (title, description, tags).
+//
+// PATCH /pages/{id}
+func (UnimplementedHandler) UpdatePage(ctx context.Context, req OptUpdatePageReq, params UpdatePageParams) (r UpdatePageRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
